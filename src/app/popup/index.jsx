@@ -23,12 +23,18 @@ class Popup extends React.Component {
       status: props.jiraSubdomain ? 'launched' : 'noSubdomain',
       error: null
     }
+    this.fetchIssues = this.fetchIssues.bind(this);
     this.showSettings = this.showSettings.bind(this);
     this.showIssues = this.showIssues.bind(this);
     this.setSubdomain = this.setSubdomain.bind(this);
   }
 
+
   componentDidMount() {
+    this.fetchIssues();
+  }
+
+  fetchIssues() {
     const { jiraSubdomain } = this.state;
 
     if (jiraSubdomain) {
@@ -52,6 +58,7 @@ class Popup extends React.Component {
   }
 
   showIssues() {
+    this.fetchIssues();
     this.setState(state => ({ mode: 'issues' }));
   }
 
