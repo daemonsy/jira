@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Jira",
+  "description": "An extension to make quick Jira jumps",
+  "version": "0.1.1",
+  "omnibox": {
+    "keyword": "j"
+  },
+  "icons": {
+    "16": "jira16.png",
+    "32": "jira32.png",
+    "48": "jira48.png",
+    "64": "jira64.png",
+    "128": "jira128.png"
+  },
+  "browser_action": {
+    "default_title": "Issues",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": false
+  },
+  "permissions": [
+    "cookies",
+    "tabs",
+    "storage",
+    "https://*.atlassian.net/"
+  ]
+}
