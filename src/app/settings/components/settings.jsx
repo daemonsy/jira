@@ -1,15 +1,52 @@
 import React from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import check from '@fortawesome/fontawesome-free-solid/faCheck';
+import times from '@fortawesome/fontawesome-free-solid/faTimes';
+import exclaimationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
 
-const subdomainPlaceholder = 'Your Jira subdomain';
+const subdomainPlaceholder = 'Jira subdomain, e.g. twilio';
 
+const validationMessages = {
+  match: null,
+  goodNoCookie: "There is no cookie for the entered subdomain. You might not be logged in to Jira.",
+  bad: "The subdomain doesn't look right. If your organization URL is acme.atlassian.net, only enter acme.",
+  blank: "Please enter your subdomain"
+};
+
+const validationIcons = {
+  match: check,
+  goodNoCookie: exclaimationTriangle,
+  bad: times
+};
+
+const validationColors = {
+  match: '#00d1b2',
+  goodNoCookie: '#ffdd57',
+  bad: '#ff3860'
+}
+
+const validateSubdomain = (jiraSubdomain, foundDomains) => {
+  let status = 'bad';
+
+  if (!jiraSubdomain) {
+    status = 'blank';
+  } else if (foundDomains.indexOf(jiraSubdomain) !== -1) {
+    status = 'match';
+  } else if (/^\w+\b$/.test(jiraSubdomain)) {
+    status = 'goodNoCookie';
+  };
+
+  return {
+    icon: validationIcons[status],
+    message: validationMessages[status],
+    color: validationColors[status]
+  };
+}
 class Settings extends React.Component {
   constructor(props) {
     super(props);
 
     this.onChange = this.onChange.bind(this);
-    this.done = this.done.bind(this);
   }
 
   onChange(event) {
@@ -17,19 +54,22 @@ class Settings extends React.Component {
     this.props.onChange(value.trim());
   }
 
-  done() {
-    this.props.done();
-  }
-
   render() {
-    const { jiraSubdomain } = this.props;
+    const { jiraSubdomain, foundDomains, done } = this.props;
+    const { icon, color, message } = validateSubdomain(jiraSubdomain, foundDomains);
 
     return (
       <div className="section settings">
-        <a onClick={this.done}>Back</a>
+        <a onClick={done}>Back</a>
         <h3 className="title">Settings</h3>
-        <form onSubmit={this.done}>
-          <div className="field has-addons">
+
+        <form onSubmit={done}>
+          <div className="field has-addons" style={{ flexWrap: 'wrap' }}>
+            <div className="control">
+              <a className="button is-static">
+                https://
+              </a>
+            </div>
             <div className="control has-icons-right is-expanded">
               <input
                 name="jiraSubdomain"
@@ -40,14 +80,17 @@ class Settings extends React.Component {
                 onChange={this.onChange}
               />
               <span className="icon is-right">
-                <FontAwesomeIcon icon={check} />
+                <FontAwesomeIcon icon={icon} color={color} />
               </span>
             </div>
-            <div className="control">
+            <div className="control is-expanded">
               <a className="button is-static">
                 .atlassian.net
               </a>
             </div>
+            { message &&
+              <p className="help" style={{ width: '100%' }}>{message}</p>
+            }
           </div>
         </form>
       </div>

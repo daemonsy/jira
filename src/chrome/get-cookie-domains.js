@@ -9,5 +9,5 @@ export default async () => {
     })
   });
 
-  return [...new Set(cookies.filter(exceptBasedomain).map(cookie => cookie.domain))];
+  return [...new Set(cookies.filter(exceptBasedomain).map(cookie => cookie.domain.split('.')[0]))];
 }

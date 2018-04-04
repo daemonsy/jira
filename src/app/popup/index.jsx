@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import cog from '@fortawesome/fontawesome-free-solid/faCog';
 import circleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch';
@@ -27,6 +27,7 @@ class Popup extends React.Component {
     this.showSettings = this.showSettings.bind(this);
     this.showIssues = this.showIssues.bind(this);
     this.setSubdomain = this.setSubdomain.bind(this);
+    this.useTheOnlyFoundSubdomain = this.useTheOnlyFoundSubdomain.bind(this);
   }
 
 
@@ -50,6 +51,8 @@ class Popup extends React.Component {
         }).catch(error => {
           this.setState({ status: 'error', error })
         });
+    } else {
+      this.setState(state => ({ status: 'noSubdomain' }));
     }
   }
 
@@ -58,8 +61,13 @@ class Popup extends React.Component {
   }
 
   showIssues() {
-    this.fetchIssues();
-    this.setState(state => ({ mode: 'issues' }));
+    this.setState(state => ({ mode: 'issues', issuesData: {} }), this.fetchIssues);
+  }
+
+  useTheOnlyFoundSubdomain() {
+    const { foundDomains } = this.props;
+    this.setSubdomain(foundDomains[0]);
+    this.showIssues();
   }
 
   setSubdomain(jiraSubdomain) {
@@ -69,6 +77,7 @@ class Popup extends React.Component {
   }
 
   render() {
+    const { foundDomains } = this.props;
     const {
       jiraSubdomain,
       mode,
@@ -81,6 +90,7 @@ class Popup extends React.Component {
       <div className="popup">
         {mode === 'settings' &&
           <Settings
+            foundDomains={foundDomains}
             jiraSubdomain={jiraSubdomain}
             onChange={this.setSubdomain}
             done={this.showIssues}
@@ -122,7 +132,19 @@ class Popup extends React.Component {
 
             {status === 'noSubdomain' &&
               <div className="message-container has-text-centered">
-                Please enter your Jira subdomain under <a onClick={this.showSettings}>settings</a>.
+                { foundDomains.length === 1 ?
+                  <div>
+                    <p className="notification">This extension needs your Jira subdomain to work. Is your organization at <strong>{foundDomains[0]}</strong>.atlassian.net?</p>
+                    <button
+                      className="button is-primary is-medium"
+                      onClick={this.useTheOnlyFoundSubdomain}
+                      style={{ width: '100% '}}>
+                      Yes, set it to {foundDomains[0]}
+                    </button>
+                    <a onClick={this.showSettings}>No, I'll enter it in Settings.</a>
+                  </div>
+                  : <span>Please enter your Jira subdomain under <a onClick={this.showSettings}>Settings</a>.</span>
+                }
               </div>
             }
 

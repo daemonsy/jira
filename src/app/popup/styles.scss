@@ -5,8 +5,11 @@
   }
 
   .message-container {
-    height: 4rem;
-    line-height: 4rem;
+    margin: 2rem 0;
+    padding: 0 4rem;
+    justify-content: center;
+    display: flex;
+    align-items: center;
   }
 
   .spinner {
