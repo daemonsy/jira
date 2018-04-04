@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Jira",
   "description": "An extension to make quick Jira jumps",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "omnibox": {
     "keyword": "j"
   },
@@ -25,7 +25,6 @@
   },
   "permissions": [
     "cookies",
-    "tabs",
     "storage",
     "https://*.atlassian.net/"
   ]
