@@ -8,7 +8,7 @@ const subdomainPlaceholder = 'Jira subdomain, e.g. twilio';
 
 const validationMessages = {
   match: null,
-  goodNoCookie: "There is no cookie for the entered subdomain. You might not be logged in to Jira.",
+  goodNoCookie: "Did not detect a cookie for this subdomain. Check for typos or you might not be logged in to Jira.",
   bad: "The subdomain doesn't look right. If your organization URL is acme.atlassian.net, only enter acme.",
   blank: "Please enter your subdomain"
 };
@@ -21,7 +21,6 @@ const validationIcons = {
 
 const validationColors = {
   match: '#00d1b2',
-  goodNoCookie: '#ffdd57',
   bad: '#ff3860'
 }
 
