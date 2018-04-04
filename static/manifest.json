@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Jira",
   "description": "An extension to make quick Jira jumps",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "omnibox": {
     "keyword": "j"
   },
