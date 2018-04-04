@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import cog from '@fortawesome/fontawesome-free-solid/faCog';
 import circleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch';
