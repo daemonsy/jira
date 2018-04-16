@@ -1,30 +1,25 @@
 import { get } from './chrome/storage';
+import ticketMatch from './utilities/ticket-match';
 
-const properTicketMatch = /\w+-\d+/;
-const dirtyNumberMatch = /\d{1,4}$/;
+import { JIRA_DOMAIN } from './config/constants';
 
-const parseTicket = ticket => {
-  switch (true) {
-    case properTicketMatch.test(ticket): {
-      return ticket;
-    }
-
-    case dirtyNumberMatch.test(ticket): {
-      return ticket.replace(dirtyNumberMatch, `-${ticket.match(dirtyNumberMatch)[0]}`);
-    }
-
-    default: {
-      return ticket;
-    }
-  }
-}
+const searchIssuesURL = (jiraSubdomain, text) =>
+  `https://${jiraSubdomain}.${JIRA_DOMAIN}/issues/?jql=`
+  + encodeURIComponent(`text ~ "${text}" order by lastViewed DESC`);
 
 chrome.omnibox.onInputEntered.addListener((input, disposition) => {
   get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
     if (input && !!input.trim() && jiraSubdomain) {
-      const ticket = parseTicket(input);
+      const ticket = ticketMatch(input);
 
-      chrome.tabs.update({ url: `https://${jiraSubdomain}.atlassian.net/browse/${ticket.toUpperCase()}` });
+      let url;
+      if (ticket) {
+        url = `https://${jiraSubdomain}.atlassian.net/browse/${ticket.toUpperCase()}`;
+      } else {
+        url = searchIssuesURL(jiraSubdomain, input);
+      }
+
+      chrome.tabs.update({ url });
     }
   });
 });
