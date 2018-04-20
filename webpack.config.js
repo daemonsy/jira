@@ -30,17 +30,19 @@ const cssRule = {
   })
 };
 
-const jsxRule = {
+const jsRule = {
   test: /\.js$|jsx$/,
   exclude: [path.resolve(__dirname, 'node_modules')],
   use: {
     loader: 'babel-loader',
     options: {
+      babelrc: false,
       presets: [
         ['@babel/preset-env', {
+          modules: false,
           targets: {
-            browsers: 'last 2 Chrome versions'
-          }
+            browsers: 'last 5 Chrome versions',
+          },
         }]
       ],
       plugins: [require('babel-plugin-transform-react-jsx')]
@@ -62,7 +64,10 @@ const plugins = [
 ];
 
 if (process.env.NODE_ENV === 'production') {
-  plugins.push(new BabelMinifyWebpackPlugin());
+  plugins.push(new BabelMinifyWebpackPlugin({
+    removeDebugger: true,
+    removeConsole: true
+  }, { comments: false }));
 }
 
 module.exports = {
@@ -88,10 +93,7 @@ module.exports = {
     filename: '[name].js'
   },
   module: {
-    rules: [
-      jsxRule,
-      cssRule
-    ]
+    rules: [jsRule, cssRule]
   },
   plugins
 };
