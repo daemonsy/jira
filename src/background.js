@@ -2,7 +2,7 @@ import { get } from './chrome/storage';
 import debounce from 'lodash-es/debounce';
 import ticketMatch from './utilities/ticket-match';
 import {
-  build,
+  buildHelper,
   apiSearchIssuesPath,
   apiIssuePath,
   pageSearchIssuesPath
@@ -29,7 +29,7 @@ const showDefaultSuggestion = description =>
   chrome.omnibox.setDefaultSuggestion({ description: escapeEntities(description) });
 
 const displayRelevantSuggestions = (input, suggest, subdomain) => {
-  const apiSearchIssuesURL = build(subdomain, apiSearchIssuesPath);
+  const apiSearchIssuesURL = buildHelper(subdomain, apiSearchIssuesPath);
 
   showDefaultSuggestion(`Search for ${input}...`);
   makeJiraApiCall(apiSearchIssuesURL(input), { credentials: 'same-origin' })
@@ -42,7 +42,7 @@ const displayRelevantSuggestions = (input, suggest, subdomain) => {
 };
 
 const displayTicketSuggestion = (ticket, suggest, subdomain) => {
-  const apiIssueURL = build(subdomain, apiIssuePath);
+  const apiIssueURL = buildHelper(subdomain, apiIssuePath);
   const key = ticket.toUpperCase();
 
   showDefaultSuggestion(`Open ${key}`);
@@ -87,7 +87,7 @@ chrome.omnibox.onInputEntered.addListener((input, disposition) => {
         const key = ticket.toUpperCase();
         url = `https://${jiraSubdomain}.atlassian.net/browse/${key}`;
       } else {
-        const pageSearchIssuesURL = build(jiraSubdomain, pageSearchIssuesPath)
+        const pageSearchIssuesURL = buildHelper(jiraSubdomain, pageSearchIssuesPath)
         url = pageSearchIssuesURL(input);
       }
 

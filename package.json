@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --watch-stdin --progress --color",
+    "test": "NODE_OPTIONS='--experimental-modules' tape -r esm 'tests/**/*.test.mjs' | tap-dot",
     "clean": "rm -rf dist && rm -f extension.zip",
     "pack": "zip -r extension.zip ./dist",
     "build:dist": "yarn run clean && NODE_ENV=production webpack --bail",
@@ -26,11 +27,14 @@
     "bulma": "^0.6.2",
     "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.7",
+    "esm": "^3.0.21",
     "extract-text-webpack-plugin": "^3.0.2",
     "html-webpack-plugin": "^3.1.0",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
+    "tap-dot": "^1.0.5",
+    "tape": "^4.9.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.9.7"
   },

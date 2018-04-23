@@ -31,7 +31,7 @@ const cssRule = {
 };
 
 const jsRule = {
-  test: /\.js$|jsx$/,
+  test: /\.js$|jsx|mjs$/,
   exclude: [path.resolve(__dirname, 'node_modules')],
   use: {
     loader: 'babel-loader',
@@ -55,7 +55,7 @@ const plugins = [
   popupPage,
   new CopyWebpackPlugin([
     { from: './static/manifest.json', to: extensionDirectory },
-    { from: './static/images/jira*', to: extensionDirectory, flatten: true }
+    { from: './static/images/jira*.png', to: extensionDirectory, flatten: true }
   ]),
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(environment || 'development')
@@ -81,7 +81,7 @@ module.exports = {
     background: './src/background.js'
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js', '.jsx', '.mjs']
   },
   devServer: {
     contentBase: extensionDirectory,
