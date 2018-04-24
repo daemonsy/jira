@@ -20,7 +20,18 @@ test('matches ADM1-1011', t => {
 
 test('does not match 1011', t => {
   t.plan(1);
+
   t.equal(match('1011'), null);
 });
 
+test('matches ADM 1234', t => {
+  t.plan(1);
 
+  t.equal(match('ADM 1234'), 'ADM-1234');
+});
+
+test('matches ADM   1234', t => {
+  t.plan(1);
+
+  t.equal(match('ADM   1234'), 'ADM-1234');
+});
