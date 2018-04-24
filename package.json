@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --watch-stdin --progress --color",
-    "test": "NODE_OPTIONS='--experimental-modules' tape -r esm 'tests/**/*.test.mjs' | tap-dot",
+    "test": "NODE_OPTIONS='--experimental-modules' tape -r esm 'tests/**/*.test.mjs' | tap-spec",
     "clean": "rm -rf dist && rm -f extension.zip",
     "pack": "zip -r extension.zip ./dist",
     "build:dist": "yarn run clean && NODE_ENV=production webpack --bail",
@@ -33,7 +33,7 @@
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.19.0",
-    "tap-dot": "^1.0.5",
+    "tap-spec": "^4.1.1",
     "tape": "^4.9.0",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.9.7"
