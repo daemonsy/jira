@@ -5,9 +5,7 @@ import circleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch';
 
 import './styles.scss';
 
-import Settings from '../settings';
 import JiraIssues from '../jira-issues';
-import { get, set } from '../../chrome/storage';
 
 const undoneAssignedIssuesURL = ({ jiraSubdomain }) => `https://${jiraSubdomain}.atlassian.net/rest/api/2/search?fields=summary,status&jql=`
   + encodeURIComponent(`assignee=currentuser() AND status!="Done" ORDER BY updated DESC`);
@@ -25,11 +23,7 @@ class Popup extends React.Component {
     }
     this.fetchIssues = this.fetchIssues.bind(this);
     this.showSettings = this.showSettings.bind(this);
-    this.showIssues = this.showIssues.bind(this);
-    this.setSubdomain = this.setSubdomain.bind(this);
-    this.useTheOnlyFoundSubdomain = this.useTheOnlyFoundSubdomain.bind(this);
   }
-
 
   componentDidMount() {
     this.fetchIssues();
@@ -57,27 +51,10 @@ class Popup extends React.Component {
   }
 
   showSettings() {
-    this.setState(state => ({ mode: 'settings' }));
-  }
-
-  showIssues() {
-    this.setState(state => ({ mode: 'issues', issuesData: {} }), this.fetchIssues);
-  }
-
-  useTheOnlyFoundSubdomain() {
-    const { foundDomains } = this.props;
-    this.setSubdomain(foundDomains[0]);
-    this.showIssues();
-  }
-
-  setSubdomain(jiraSubdomain) {
-    this.setState({ jiraSubdomain }, () => {
-      this.props.setSubdomain(jiraSubdomain);
-    });
+    chrome.runtime.openOptionsPage();
   }
 
   render() {
-    const { foundDomains } = this.props;
     const {
       jiraSubdomain,
       mode,
@@ -88,14 +65,6 @@ class Popup extends React.Component {
 
     return (
       <div className="popup">
-        {mode === 'settings' &&
-          <Settings
-            foundDomains={foundDomains}
-            jiraSubdomain={jiraSubdomain}
-            onChange={this.setSubdomain}
-            done={this.showIssues}
-          />
-        }
         {mode === 'issues' &&
           <div className="jira-container panel">
             <p className='panel-heading'>
@@ -132,19 +101,7 @@ class Popup extends React.Component {
 
             {status === 'noSubdomain' &&
               <div className="message-container has-text-centered">
-                { foundDomains.length === 1 ?
-                  <div>
-                    <p className="notification">This extension needs your Jira subdomain to work. Is your organization at <strong>{foundDomains[0]}</strong>.atlassian.net?</p>
-                    <button
-                      className="button is-primary is-medium"
-                      onClick={this.useTheOnlyFoundSubdomain}
-                      style={{ width: '100% '}}>
-                      Yes, set it to {foundDomains[0]}
-                    </button>
-                    <a onClick={this.showSettings}>No, I'll enter it in Settings.</a>
-                  </div>
-                  : <span>Please enter your Jira subdomain under <a onClick={this.showSettings}>Settings</a>.</span>
-                }
+                <span>Please enter your Jira subdomain under <a onClick={this.showSettings}>Settings</a>.</span>
               </div>
             }
 

@@ -17,7 +17,7 @@ const escapeEntities = (text) => {
 
 const messages = {
   defaultPrompt: 'Type in a ticket number or free text to search for issues',
-  noSubdomain: 'Jira subdomain needs to be entered. Click on the extension icon to do so.',
+  noSubdomain: 'Jira subdomain needs to be entered. Click here or hit enter to open the Settings page',
   typeMore: 'Nothing yet. Keep typing :)'
 };
 
@@ -79,6 +79,11 @@ const onInputChangedHandler = debounce((input, suggest) => {
 
 chrome.omnibox.onInputEntered.addListener((input, disposition) => {
   get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
+    if (!jiraSubdomain) {
+      chrome.runtime.openOptionsPage();
+      return;
+    }
+
     if (input && !!input.trim() && jiraSubdomain) {
       const ticket = ticketMatch(input);
 

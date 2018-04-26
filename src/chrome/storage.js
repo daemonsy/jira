@@ -7,3 +7,6 @@ export const set = object =>
   new Promise((resolve, reject) => {
     chrome.storage.sync.set(object, resolve)
   });
+
+  export const addOnChangedListener = listener =>
+    chrome.storage.onChanged.addListener(listener);

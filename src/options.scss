@@ -1,0 +1,45 @@
+@import "~bulma/sass/utilities/_all";
+@import "~bulma/sass/base/_all";
+@import "~bulma/sass/elements/form";
+@import "~bulma/sass/elements/button";
+@import "~bulma/sass/elements/title";
+@import "~bulma/sass/elements/icon";
+
+.options-wrapper {
+  margin: 3rem auto;
+  border: 1px solid #EEE;
+  border-radius: 3px;
+  width: 500px;
+  min-height: 400px;
+  padding: 1.5rem;
+
+  .title {
+    text-align: center;
+  }
+
+  .help {
+    width: 100%;
+  }
+}
+
+.message {
+  background-color: whitesmoke;
+  border-radius: 4px;
+  padding: 1.25rem 2.5rem 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.muted {
+  margin-top: 1rem;
+  background-color: whitesmoke;
+  padding: 1.25rem 2.5rem 1.25rem 1.5rem;
+  font-size: 0.8rem;
+  p {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.close-button {
+  text-align: center;
+  width: 100%;
+}
