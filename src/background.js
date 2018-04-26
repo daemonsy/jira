@@ -79,6 +79,11 @@ const onInputChangedHandler = debounce((input, suggest) => {
 
 chrome.omnibox.onInputEntered.addListener((input, disposition) => {
   get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
+    if (!jiraSubdomain) {
+      chrome.runtime.openOptionsPage();
+      return;
+    }
+
     if (input && !!input.trim() && jiraSubdomain) {
       const ticket = ticketMatch(input);
 
