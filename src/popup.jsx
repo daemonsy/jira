@@ -10,18 +10,11 @@ import Popup from './app/popup';
 const root = document.createElement('div');
 document.body.append(root);
 
-const setSubdomain = jiraSubdomain =>
-  set({ jiraSubdomain }, null);
-
 setTimeout(() => {
   Promise.all([get(['jiraSubdomain']), getCookieDomains()])
     .then(([{ jiraSubdomain }, foundDomains]) => {
       ReactDOM.render(
-        <Popup
-          jiraSubdomain={jiraSubdomain}
-          foundDomains={foundDomains}
-          setSubdomain={setSubdomain}
-        />,
+        <Popup jiraSubdomain={jiraSubdomain} />,
         root
       )
     });

@@ -22,6 +22,13 @@ const popupPage = new HtmlWebpackPlugin({
   filename: `${extensionDirectory}/popup.html`
 });
 
+const optionsPage = new HtmlWebpackPlugin({
+  title: 'Jira',
+  chunks: ['options'],
+  template: './src/options.html',
+  filename: `${extensionDirectory}/options.html`
+});
+
 const cssRule = {
   test: /\.scss$/,
   use: ExtractTextPlugin.extract({
@@ -53,6 +60,7 @@ const jsRule = {
 const plugins = [
   backgroundPage,
   popupPage,
+  optionsPage,
   new CopyWebpackPlugin([
     { from: './static/manifest.json', to: extensionDirectory },
     { from: './static/images/jira*.png', to: extensionDirectory, flatten: true }
@@ -78,7 +86,8 @@ module.exports = {
   },
   entry: {
     popup: './src/popup.jsx',
-    background: './src/background.js'
+    background: './src/background.js',
+    options: './src/options.js'
   },
   resolve: {
     extensions: ['.js', '.jsx', '.mjs']
