@@ -102,3 +102,9 @@ chrome.omnibox.onInputEntered.addListener((input, disposition) => {
 });
 
 chrome.omnibox.onInputChanged.addListener(onInputChangedHandler);
+
+chrome.runtime.onInstalled.addListener(({ reason }, previousVersion, _) => {
+  if (reason === 'install') {
+    chrome.runtime.openOptionsPage();
+  }
+});
