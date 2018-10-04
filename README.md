@@ -9,6 +9,9 @@ Currently, I've assumed that power users who might value this embrace keyboard s
 
 ![Omnibox feature](docs/images/omnibox.jpg)
 
+## I have a features suggestion...
+Great! Thank you. Please look at the [projects](https://github.com/daemonsy/jira/projects) to see if it's in the pipeline. But still open an issue, I'd like to know what's important to users.
+
 ## Development Guide
 
 This project uses `yarn`.
