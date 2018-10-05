@@ -55,10 +55,7 @@ const displayProjectSuggestion = (key, suggest, subdomain) => {
     if (errorMessages.length) {
       showDefaultSuggestion(`Open project ${key}. Heads up, no project found with this key :(`);
     } else {
-      suggest([{
-        content: foundKey,
-        description: escapeEntities([`Project ${name} (${foundKey})`, description].filter(Boolean).join(": "))
-      }]);
+      showDefaultSuggestion(escapeEntities(`Open project ${foundKey}: ${[name, description].filter(Boolean).join(" - ")}`));
     }
   });
 };
@@ -77,13 +74,7 @@ const displayTicketSuggestion = (key, suggest, subdomain) => {
           summary,
           status: { name }
         } = fields;
-
-        suggest([
-          {
-            content: foundKey,
-            description: escapeEntities(`${foundKey}: [${name}] ${summary}`)
-          }
-        ]);
+        showDefaultSuggestion(escapeEntities(`Open issue ${foundKey}: [${name}] ${summary}`))
       }
     }
   );
