@@ -10,6 +10,9 @@
     "build:dist": "yarn run clean && NODE_ENV=production webpack --bail",
     "release": "yarn run build:dist && yarn run pack"
   },
+  "resolutions": {
+    "upath": "1.1.0"
+  },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.5",
     "@fortawesome/fontawesome-free-solid": "^5.0.9",
