@@ -10,6 +10,9 @@
     "build:dist": "yarn run clean && NODE_ENV=production webpack --bail",
     "release": "yarn run build:dist && yarn run pack"
   },
+  "resolutions": {
+    "upath": "^1.1.0"
+  },
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.5",
     "@fortawesome/fontawesome-free-solid": "^5.0.9",
@@ -19,24 +22,26 @@
     "react-dom": "^16.3.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.44",
-    "@babel/preset-env": "^7.0.0-beta.44",
-    "babel-loader": "^8.0.0-beta.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "babel-loader": "^8.0.4",
     "babel-minify-webpack-plugin": "^0.3.1",
     "babel-plugin-transform-react-jsx": "7.0.0-beta.3",
     "bulma": "^0.7.0",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^0.28.7",
+    "copy-webpack-plugin": "^4.5.2",
+    "css-loader": "^1.0.0",
     "esm": "^3.0.21",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "html-webpack-plugin": "^3.1.0",
+    "html-webpack-plugin": "^3.2.0",
+    "mini-css-extract-plugin": "^0.4.3",
     "node-sass": "^4.7.2",
-    "sass-loader": "^6.0.6",
-    "style-loader": "^0.19.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.0",
     "tap-spec": "^4.1.1",
     "tape": "^4.9.0",
-    "webpack": "^3.10.0",
-    "webpack-dev-server": "^2.9.7"
+    "upath": "^1.1.0",
+    "webpack": "^4.20.2",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.9"
   },
   "prettier": {
     "singleQuote": true,
