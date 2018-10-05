@@ -23,3 +23,9 @@ export const pageSearchIssuesPath = text =>
 
 export const buildHelper = (subdomain, pathFunction) =>
   (...args) => buildBaseURL(subdomain) + pathFunction(...args)
+
+export const apiProjectsPath = (projectKeyOrId, { recent = 5, ...rest } = {}) =>
+  `/rest/api/2/project?${buildQuery({ projectKeyOrId, recent, ...rest })}`
+
+export const apiProjectPath = projectKeyOrId =>
+  `/rest/api/2/project/${projectKeyOrId}`

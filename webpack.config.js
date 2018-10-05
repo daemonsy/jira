@@ -3,7 +3,7 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const BabelMinifyWebpackPlugin = require('babel-minify-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const environment = process.env.NODE_ENV || 'development';
 const extensionDirectory = path.resolve(__dirname, environment === 'production' ? './dist' : './build');
@@ -31,10 +31,7 @@ const optionsPage = new HtmlWebpackPlugin({
 
 const cssRule = {
   test: /\.scss$/,
-  use: ExtractTextPlugin.extract({
-    fallback: 'style-loader',
-    use: ['css-loader', 'sass-loader']
-  })
+  use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
 };
 
 const jsRule = {
@@ -48,7 +45,7 @@ const jsRule = {
         ['@babel/preset-env', {
           modules: false,
           targets: {
-            browsers: 'last 5 Chrome versions',
+            browsers: 'last 10 Chrome versions',
           },
         }]
       ],
@@ -68,7 +65,9 @@ const plugins = [
   new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(environment || 'development')
   }),
-  new ExtractTextPlugin('[name].css')
+  new MiniCssExtractPlugin({
+    filename: "[name].css"
+  })
 ];
 
 if (process.env.NODE_ENV === 'production') {
@@ -79,6 +78,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 module.exports = {
+  mode: process.env.NODE_ENV || 'development',
   devtool: false,
   stats: {
     children: false,

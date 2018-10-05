@@ -2,7 +2,9 @@ import test from 'tape';
 import {
   buildHelper,
   apiIssuePath,
-  apiSearchIssuesPath
+  apiSearchIssuesPath,
+  apiProjectsPath,
+  apiProjectPath
 } from '../../src/jira/paths';
 
 test('buildHelper returns a URL helper function from the subdomain and a path helper', t => {
@@ -30,3 +32,19 @@ test('apiSearchIssuesPath returns /issues?jql=<text for search>', t => {
 
   t.equal(path, `/rest/api/2/search/?fields=status&maxResults=5&jql=${searchString}`)
 });
+
+test('apiProjectsPath returns /project?recent=10&projectKeyOrId=LPJ', t => {
+  t.plan(1)
+
+  const path = apiProjectsPath('LPJ', { recent: 10 });
+  t.equal(path, `/rest/api/2/project?projectKeyOrId=LPJ&recent=10`);
+});
+
+
+test('apiProjectPath returns /project/LPJ', t => {
+  t.plan(1)
+
+  const path = apiProjectPath('LPJ');
+  t.equal(path, `/rest/api/2/project/LPJ`);
+});
+
