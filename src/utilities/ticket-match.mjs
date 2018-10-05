@@ -6,9 +6,6 @@ const digitsOnlyMismatch = /^\d+$/; // e.g. 1065
 
 export default text => {
   switch (true) {
-    case digitsOnlyMismatch.test(text): {
-      return null;
-    }
 
     case spacedTicketMatch.test(text): {
       return {
