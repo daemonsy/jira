@@ -86,7 +86,7 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { jiraSubdomain, foundDomains, done } = this.props;
+    const { jiraSubdomain, foundDomains } = this.props;
     const { icon, color, message } = validateSubdomain(jiraSubdomain, foundDomains);
     const mode = this.currentMode(this.props, this.state);
 
@@ -109,7 +109,7 @@ class Settings extends React.Component {
                     type="text"
                     className="input has-text-right"
                     placeholder={subdomainPlaceholder}
-                    value={jiraSubdomain}
+                    value={jiraSubdomain || ''}
                     onChange={this.onChange}
                   />
                   { icon &&
