@@ -2,13 +2,15 @@ const webpack = require('webpack');
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const BabelMinifyWebpackPlugin = require('babel-minify-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
+const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const environment = process.env.NODE_ENV || 'development';
 const extensionDirectory = path.resolve(__dirname, environment === 'production' ? './dist' : './build');
 
 console.log(`Running webpack in ${environment} mode`);
+
+const inProduction = process.env.NODE_ENV === 'production';
 
 const backgroundPage = new HtmlWebpackPlugin({
   title: null,
@@ -70,16 +72,20 @@ const plugins = [
   })
 ];
 
-if (process.env.NODE_ENV === 'production') {
-  plugins.push(new BabelMinifyWebpackPlugin({
-    removeDebugger: true,
-    removeConsole: true
-  }, { comments: false }));
-}
-
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
   devtool: false,
+  optimization: {
+    minimize: inProduction,
+    minimizer: [
+      new UglifyJSPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: false // set to true if you want JS source maps
+      }),
+      new OptimizeCSSAssetsPlugin({})
+    ]
+  },
   stats: {
     children: false,
     modules: false
