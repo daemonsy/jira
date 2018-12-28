@@ -7,6 +7,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const environment = process.env.NODE_ENV || 'development';
 const extensionDirectory = path.resolve(__dirname, environment === 'production' ? './dist' : './build');
+const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 
 console.log(`Running webpack in ${environment} mode`);
 
@@ -72,6 +73,16 @@ const plugins = [
   })
 ];
 
+if (!inProduction) {
+  plugins.push(new ChromeExtensionReloader({
+    reloadPage: true,
+    entries: {
+      contentScript: 'github',
+      background: 'background'
+    }
+  }))
+}
+
 module.exports = {
   mode: process.env.NODE_ENV || 'development',
   devtool: false,
@@ -91,6 +102,7 @@ module.exports = {
     modules: false
   },
   entry: {
+    github: './src/github.js',
     popup: './src/popup.jsx',
     background: './src/background.js',
     options: './src/options.js'
