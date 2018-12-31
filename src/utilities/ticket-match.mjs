@@ -1,8 +1,4 @@
-const projectKeyMatch = /^[A-Z][A-Z0-9_]+$/;
-const properTicketMatch = /\w+-\d+/; // LPJ-1234
-const spacedTicketMatch = /\w+\s+\d+/; // LPJ 12345 or LPJ  12345
-const dirtyTicketMatch = /^[A-Z]+\d+$/; // e.g. LPJ1234
-const digitsOnlyMismatch = /^\d+$/; // e.g. 1065
+import { projectKeyMatch, properTicketMatch, spacedTicketMatch, dirtyTicketMatch } from './ticket-regex';
 
 export default text => {
   switch (true) {

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Jira",
   "description": "An extension to make quick Jira jumps via the omnibox",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "omnibox": {
     "keyword": "j"
   },
@@ -22,11 +22,17 @@
     "scripts": [
       "background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "permissions": [
     "cookies",
     "storage",
     "https://*.atlassian.net/"
+  ],
+  "optional_permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "tabs",
+    "*://*/*"
   ]
 }

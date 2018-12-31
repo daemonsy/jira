@@ -11,22 +11,38 @@ import Settings from './app/settings';
 const root = document.getElementById('options');
 
 const setSubdomain = jiraSubdomain =>
-  set({ jiraSubdomain }, null);
+  set({ jiraSubdomain });
+
+const setGithubURL = githubURL => set({ githubURL });
+
+const requestGithubPermissions = () => {
+  get(['githubURL']).then(({ githubURL}) => {
+    chrome.permissions.request({
+      permissions: ["webRequest", "webRequestBlocking", "tabs"],
+      origins: [`*://${githubURL}/*`]
+    }, (granted) => {
+
+    });
+  });
+}
 
 const render = () =>
-  Promise.all([get(['jiraSubdomain']), getCookieDomains()]).then(([{ jiraSubdomain }, foundDomains]) => {
+  Promise.all([get(['jiraSubdomain', 'githubURL']), getCookieDomains()]).then(([{ jiraSubdomain, githubURL }, foundDomains]) => {
     ReactDOM.render(
       <Settings
         jiraSubdomain={jiraSubdomain}
+        githubURL={githubURL}
         foundDomains={foundDomains}
         onChange={setSubdomain}
+        onGithubURLChange={setGithubURL}
+        onRequestGithubPermissions={requestGithubPermissions}
       />,
       root
     )
   });
 
-addOnChangedListener(({ jiraSubdomain }) => {
-  if (jiraSubdomain) {
+addOnChangedListener(({ jiraSubdomain, githubURL }) => {
+  if (jiraSubdomain || githubURL) {
     render();
   }
 });

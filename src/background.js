@@ -1,12 +1,12 @@
 import { get } from './chrome/storage';
 import debounce from 'lodash-es/debounce';
 import ticketMatch from './utilities/ticket-match';
+import { pullRequestURL } from './utilities/regex';
 import {
   buildHelper,
   apiSearchIssuesPath,
   apiIssuePath,
   apiProjectPath,
-  apiProjectsPath,
   pageSearchIssuesPath,
 } from './jira/paths';
 
@@ -34,7 +34,6 @@ const showDefaultSuggestion = description =>
 
 const displayRelevantSuggestions = (input, suggest, subdomain) => {
   const apiSearchIssuesURL = buildHelper(subdomain, apiSearchIssuesPath);
-  const apiProjectsURL = buildHelper(subdomain, apiProjectsPath);
 
   showDefaultSuggestion(`Search for ${input}...`);
   makeJiraApiCall(apiSearchIssuesURL(input), {
@@ -149,4 +148,22 @@ chrome.runtime.onInstalled.addListener(({ reason }, previousVersion, _) => {
   if (reason === 'install') {
     chrome.runtime.openOptionsPage();
   }
+});
+
+get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
+  chrome.webRequest.onBeforeSendHeaders.addListener((details) => {
+    const userAgent = details.requestHeaders.find(header => header.name === 'User-Agent');
+    userAgent.value = 'chrome-jira-extension-odofgglajlcgbjcbbifcehfhbalgeacl';
+    return {requestHeaders: details.requestHeaders};
+  }, {urls: [`https://${jiraSubdomain}.atlassian.net/rest/api/*`]}, ['blocking', 'requestHeaders']);
+});
+
+chrome.tabs.onUpdated.addListener((tabId, { status }, tab) => {
+  get(['githubURL']).then(({ githubURL }) => {
+    if (status !== 'complete') return;
+    if (tab.url.includes(githubURL) && pullRequestURL.test(tab.url)) {
+      console.debug('Injecting on ', tab.url);
+      chrome.tabs.executeScript({ file: 'github.js' });
+    }
+  });
 });

@@ -15,8 +15,8 @@ export const buildBaseURL = subdomain =>
 export const apiSearchIssuesPath = (text, { fields = 'summary,status', maxResults = 10 } = {}) =>
   `/rest/api/2/search/?${buildQuery({ fields, maxResults, jql: textSearchQueryComponent(text) })}`;
 
-export const apiIssuePath = (key, { fields = 'summary,status' } = {}) =>
-  `/rest/api/2/issue/${key}?${buildQuery({ fields })}`;
+export const apiIssuePath = (key, { fields = 'summary,status', expand = '' } = {}) =>
+  `/rest/api/2/issue/${key}?${buildQuery({ fields, expand })}`;
 
 export const pageSearchIssuesPath = text =>
   `/issues/?jql=${textSearchQueryComponent(text)}`;
@@ -29,3 +29,6 @@ export const apiProjectsPath = (projectKeyOrId, { recent = 5, ...rest } = {}) =>
 
 export const apiProjectPath = projectKeyOrId =>
   `/rest/api/2/project/${projectKeyOrId}`
+
+export const apiTransitionsPath = key=>
+  `/rest/api/3/issue/${key}/transitions`

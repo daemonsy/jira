@@ -6,6 +6,7 @@ import exclaimationTriangle from '@fortawesome/fontawesome-free-solid/faExclamat
 import PropTypes from 'prop-types';
 
 const subdomainPlaceholder = 'Jira subdomain, e.g. twilio';
+const githubURLPlaceholder = 'Github URL, e.g. github.com';
 
 const validationMessages = {
   match: "Looks good, detected a cookie at this subdomain",
@@ -53,6 +54,8 @@ class Settings extends React.Component {
 
     this.onChange = this.onChange.bind(this);
     this.noLongerPristine = this.noLongerPristine.bind(this);
+    this.onGithubURLChange = this.onGithubURLChange.bind(this);
+    this.onRequestGithubPermissions = this.onRequestGithubPermissions.bind(this);
   }
 
   onChange(event) {
@@ -62,11 +65,22 @@ class Settings extends React.Component {
     this.noLongerPristine();
   }
 
+  onGithubURLChange(event) {
+    const { target: { value } } = event;
+    event.preventDefault();
+    this.props.onGithubURLChange(value.trim());
+  }
+
+  onRequestGithubPermissions(event) {
+    event.preventDefault();
+    this.props.onRequestGithubPermissions();
+  }
+
   noLongerPristine() {
     this.setState({ pristine: false });
   }
 
-  currentMode(props, state) {
+  currentMode(props) {
     const { jiraSubdomain, foundDomains } = props;
     const { pristine } = this.state;
 
@@ -86,17 +100,18 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { jiraSubdomain, foundDomains } = this.props;
+    const { jiraSubdomain, foundDomains, githubURL } = this.props;
     const { icon, color, message } = validateSubdomain(jiraSubdomain, foundDomains);
     const mode = this.currentMode(this.props, this.state);
 
     return (
       <div className="section settings">
-        <h1 className="title">Jira Settings</h1>
+        <h1 className="title main-title">Jira Settings</h1>
 
         { mode === 'settings' &&
           <React.Fragment>
             <form className="settings-form">
+              <h4 className="title is-size-4">Subdomain</h4>
               <div className="field has-addons" style={{ flexWrap: 'wrap' }}>
                 <div className="control">
                   <a className="button is-static">
@@ -127,7 +142,31 @@ class Settings extends React.Component {
                   <p className="help">{message}</p>
                 }
               </div>
-
+              <hr/>
+              <h4 className="title is-size-4">Github Integration</h4>
+              <p>Enter your Github URL to show pull out Jira card information in a pull request</p>
+              <div className="field has-addons" style={{ flexWrap: 'wrap' }}>
+                <div className="control">
+                  <a className="button is-static">
+                    https://
+                  </a>
+                </div>
+                <div className="control is-expanded">
+                  <input
+                    name="githubURL"
+                    type="text"
+                    className="input has-text-right"
+                    placeholder={githubURLPlaceholder}
+                    value={githubURL || ''}
+                    onChange={this.onGithubURLChange}
+                  />
+                </div>
+                <div className="control">
+                  <a className="button is-primary" onClick={this.onRequestGithubPermissions}>
+                    Grant Access
+                  </a>
+                </div>
+              </div>
               <button
                 onClick={window.close}
                 className="is-primary button is-medium close-button"
@@ -136,7 +175,7 @@ class Settings extends React.Component {
             <div className="muted">
               <p><strong>Quick Start:</strong> Type <code>j</code>, then <code>tab</code>, type in a issue key (HSI-123) or free text to search. You must be logged in to Jira.</p>
               <p><strong>How this works:</strong> After you entered the subdomain, this extension makes API requests to <code>your-domain.atlassian.net</code> using same origin cookies.</p>
-              <p>Permission to <code>*.atlassian.net</code> is required to retrieve the cookie for authentication. The extension does not manipulate the cookies in any other way.</p>
+              <p>Permission to <code>*.atlassian.net</code> is required for same origin Jira API requests.</p>
             </div>
           </React.Fragment>
         }
