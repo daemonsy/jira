@@ -58,7 +58,7 @@ const truncate = {
 };
 
 const cardTitleStyles = {
-  width: '480px'
+  width: '460px'
 };
 
 const avatarStyles = {
