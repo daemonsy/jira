@@ -76,6 +76,18 @@ class Settings extends React.Component {
     this.props.onRequestGithubPermissions();
   }
 
+  githubURLValid() {
+    const { githubURL } = this.props;
+    let url;
+
+    try {
+      url = new URL(`https://${githubURL}/`);
+    } catch (error) {
+      return false;
+    }
+    return !!url.hostname;
+  }
+
   noLongerPristine() {
     this.setState({ pristine: false });
   }
@@ -100,9 +112,14 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { jiraSubdomain, foundDomains, githubURL } = this.props;
-    const { icon, color, message } = validateSubdomain(jiraSubdomain, foundDomains);
+    const { jiraSubdomain, foundDomains, githubURL, githubPermissionGranted } = this.props;
+    const { icon, message, color } = validateSubdomain(jiraSubdomain, foundDomains);
     const mode = this.currentMode(this.props, this.state);
+
+    // Sorry I've sinned. Clean up in https://github.com/daemonsy/jira/issues/13
+    const githubValidationIcon = validationIcons[githubPermissionGranted ? 'match' : 'goodNoCookie'];
+    const githubValidationColor = githubPermissionGranted ? validationColors.match : null;
+    const githubValidationMessage = githubPermissionGranted ? `Great! Permission to inject on https://${githubURL}/ granted` : `Permission to access your github host required`
 
     return (
       <div className="section settings">
@@ -142,16 +159,21 @@ class Settings extends React.Component {
                   <p className="help">{message}</p>
                 }
               </div>
+              <div className="muted">
+                <p><strong>Quick Start:</strong> Type <code>j</code>, then <code>tab</code>, type in a issue key (HSI-123) or free text to search. You must be logged in to Jira.</p>
+                <p><strong>How this works:</strong> After you entered the subdomain, this extension makes API requests to <code>your-domain.atlassian.net</code> using same origin cookies.</p>
+                <p>Permission to <code>*.atlassian.net</code> is required for same origin Jira API requests.</p>
+              </div>
               <hr/>
-              <h4 className="title is-size-4">Github Integration</h4>
-              <p>Enter your Github URL to show pull out Jira card information in a pull request</p>
+              <h4 className="title is-size-4">Github Integration (Experimental)</h4>
+              <p className="subtitle is-size-6">Enter your Github URL to show pull out Jira card information in a pull request</p>
               <div className="field has-addons" style={{ flexWrap: 'wrap' }}>
                 <div className="control">
                   <a className="button is-static">
                     https://
                   </a>
                 </div>
-                <div className="control is-expanded">
+                <div className="control is-expanded has-icons-right is-expanded">
                   <input
                     name="githubURL"
                     type="text"
@@ -160,23 +182,28 @@ class Settings extends React.Component {
                     value={githubURL || ''}
                     onChange={this.onGithubURLChange}
                   />
+                  <span className="icon is-right">
+                    <FontAwesomeIcon icon={githubValidationIcon} color={githubValidationColor} />
+                  </span>
                 </div>
                 <div className="control">
-                  <a className="button is-primary" onClick={this.onRequestGithubPermissions}>
-                    Grant Access
-                  </a>
+                  <button type="button" className="button is-primary" disabled={!this.githubURLValid()} onClick={this.onRequestGithubPermissions}>
+                    Permit
+                  </button>
                 </div>
+                <p className="help">{githubValidationMessage}</p>
               </div>
+              <div className="muted">
+                <p><strong>How this works:</strong> When you visit a Pull Request link on Github, a regex scan for tickets (e.g. HSI-123) is done on the branch name, title and finally description. </p>
+                <p>It tries to pull out information about the best matched ticket and allows you to transition the card.</p>
+                <p>Access to your Github host is required to inject the UI.</p>
+              </div>
+              <hr/>
               <button
                 onClick={window.close}
                 className="is-primary button is-medium close-button"
               >Close this page</button>
             </form>
-            <div className="muted">
-              <p><strong>Quick Start:</strong> Type <code>j</code>, then <code>tab</code>, type in a issue key (HSI-123) or free text to search. You must be logged in to Jira.</p>
-              <p><strong>How this works:</strong> After you entered the subdomain, this extension makes API requests to <code>your-domain.atlassian.net</code> using same origin cookies.</p>
-              <p>Permission to <code>*.atlassian.net</code> is required for same origin Jira API requests.</p>
-            </div>
           </React.Fragment>
         }
 
