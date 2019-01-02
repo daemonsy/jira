@@ -32,20 +32,16 @@ const initializeDOM = e => {
   if(!navbar) { return; }
   const container = document.getElementById(containerID);
   if(container) { return; }
-  console.debug('injecting into page');
 
   get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
     if(!jiraSubdomain) { return; }
     const ticketMatches = getTicketMatches();
-    console.debug('initialize DOM');
     const jiraClient = getClientInstance(jiraSubdomain);
     const container = document.createElement('div');
     container.id = containerID;
     navbar.insertAdjacentElement('beforebegin', container);
 
     injectJiraBarAboveConversation(container, { jiraClient, ticketMatches});
-
-    console.debug('run success');
   });
 }
 

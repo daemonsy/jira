@@ -7,7 +7,6 @@ const injectContentScriptHandler = (tabId, { status }, tab) => {
   get(['githubURL']).then(({ githubURL }) => {
     if (!githubURL || status !== 'complete') return;
     if (tab.url.includes(githubURL) && pullRequestURL.test(tab.url)) {
-      console.debug('Injecting on ', tab.url);
       chrome.tabs.executeScript({ file: 'github.js' });
     }
   });
@@ -17,7 +16,7 @@ const jiraAPIInterceptHandler = ({ requestHeaders }) => {
   const extensionUserAgent = `chrome-jira-extension-${chrome.runtime.id}`;
   const userAgent = requestHeaders.find(header => header.name === 'User-Agent');
   userAgent.value = extensionUserAgent;
-  console.log(requestHeaders)
+
   return { requestHeaders };
 };
 
@@ -25,12 +24,11 @@ const manageGithubInjectLifecycle = ({ githubURL }) => {
   const hasExistingListener = chrome.tabs.onUpdated.hasListener(injectContentScriptHandler);
   chrome.permissions.contains(githubFeaturePermissions({ githubURL }), result => {
     if(githubURL && !hasExistingListener && result) {
-      console.debug('add Github inject tab listener');
       chrome.tabs.onUpdated.addListener(injectContentScriptHandler);
     }
 
     if((!githubURL || !result) && hasExistingListener) {
-      console.debug('remove Github inject tab listener');
+
       chrome.tabs.onUpdated.removeListener(injectContentScriptHandler);
     }
   });
