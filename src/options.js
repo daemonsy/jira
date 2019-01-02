@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 
 import { get, set, addOnChangedListener } from './chrome/storage';
 import getCookieDomains from './chrome/get-cookie-domains';
-import githubHostPermissions from './chrome/permissions/github-host';
+import githubFeaturePermissions from './chrome/permissions/github-feature';
 
 import Settings from './app/settings';
 
@@ -17,8 +17,8 @@ const setSubdomain = jiraSubdomain =>
 const setGithubURL = githubURL => set({ githubURL });
 
 const requestGithubPermissions = () => {
-  get(['githubURL']).then(({ githubURL }) => {
-    chrome.permissions.request(githubHostPermissions(githubURL), granted => {
+  get(['githubURL', 'jiraSubdomain']).then(({ githubURL, jiraSubdomain }) => {
+    chrome.permissions.request(githubFeaturePermissions({ githubURL, jiraSubdomain }), granted => {
       render();
     });
   });
@@ -26,7 +26,7 @@ const requestGithubPermissions = () => {
 
 const render = () =>
   Promise.all([get(['jiraSubdomain', 'githubURL']), getCookieDomains()]).then(([{ jiraSubdomain, githubURL }, foundDomains]) => {
-    chrome.permissions.contains(githubHostPermissions(githubURL), result => {
+    chrome.permissions.contains(githubFeaturePermissions({ githubURL, jiraSubdomain }), result => {
       ReactDOM.render(
         <Settings
           jiraSubdomain={jiraSubdomain}

@@ -1,7 +1,7 @@
 
 import { get } from '../storage';
 import { pullRequestURL } from '../../utilities/regex';
-import githubHostPermissions from '../permissions/github-host';
+import githubFeaturePermissions from '../permissions/github-feature';
 
 const injectContentScriptHandler = (tabId, { status }, tab) => {
   get(['githubURL']).then(({ githubURL }) => {
@@ -13,33 +13,56 @@ const injectContentScriptHandler = (tabId, { status }, tab) => {
   });
 }
 
-const manageGithubInjectLifecycle = githubURL => {
+const jiraAPIInterceptHandler = ({ requestHeaders }) => {
+  const extensionUserAgent = `chrome-jira-extension-${chrome.runtime.id}`;
+  const userAgent = requestHeaders.find(header => header.name === 'User-Agent');
+  userAgent.value = extensionUserAgent;
+  console.log(requestHeaders)
+  return { requestHeaders };
+};
+
+const manageGithubInjectLifecycle = ({ githubURL }) => {
   const hasExistingListener = chrome.tabs.onUpdated.hasListener(injectContentScriptHandler);
-  chrome.permissions.contains(githubHostPermissions(githubURL), result => {
+  chrome.permissions.contains(githubFeaturePermissions({ githubURL }), result => {
     if(githubURL && !hasExistingListener && result) {
-      console.log('add listener');
+      console.debug('add Github inject tab listener');
       chrome.tabs.onUpdated.addListener(injectContentScriptHandler);
     }
 
     if((!githubURL || !result) && hasExistingListener) {
-      console.log('remove listner');
+      console.debug('remove Github inject tab listener');
       chrome.tabs.onUpdated.removeListener(injectContentScriptHandler);
     }
   });
 }
 
-export default chrome => {
-  const extensionUserAgent = `chrome-jira-extension-${chrome.runtime.id}`;
+const manageJiraAPIInterceptLifecycle = () => {
+  get(['githubURL', 'jiraSubdomain']).then(({ githubURL, jiraSubdomain }) => {
+    if(!jiraSubdomain || !githubURL ) return;
+    const filter = { urls: [`https://${jiraSubdomain}.atlassian.net/rest/api/*`] };
+    const extraInfo = ['blocking', 'requestHeaders'];
 
-  chrome.storage.onChanged.addListener(({ githubURL: { newValue: githubURL } = {}}, namespace) => manageGithubInjectLifecycle(githubURL));
+    chrome.permissions.contains(githubFeaturePermissions({ githubURL }), results => {
+      if(results) {
+        chrome.webRequest.onBeforeSendHeaders
+          .addListener(jiraAPIInterceptHandler, filter, extraInfo)
+      } else {
+        chrome.webRequest && chrome.webRequest.onBeforeSendHeaders.removeListener(jiraAPIInterceptHandler);
+      }
 
-  get(['githubURL']).then(({ githubURL }) => manageGithubInjectLifecycle(githubURL));
-
-  get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
-    chrome.webRequest.onBeforeSendHeaders.addListener(({ requestHeaders }) => {
-      const userAgent = requestHeaders.find(header => header.name === 'User-Agent');
-      userAgent.value = extensionUserAgent;
-      return { requestHeaders };
-    }, { urls: [`https://${jiraSubdomain}.atlassian.net/rest/api/*`] }, ['blocking', 'requestHeaders']);
+      manageGithubInjectLifecycle({ githubURL })
+    });
   });
+}
+
+export default chrome => {
+  chrome.storage.onChanged
+    .addListener(({ githubURL: { newValue: githubURL } = {}}, namespace) => manageGithubInjectLifecycle({ githubURL }));
+
+  chrome.permissions.onAdded.addListener(manageJiraAPIInterceptLifecycle);
+
+  chrome.permissions.onRemoved.addListener(manageJiraAPIInterceptLifecycle);
+
+  get(['githubURL'])
+    .then(({ githubURL }) => manageGithubInjectLifecycle({ githubURL }));
 };
