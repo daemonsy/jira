@@ -211,6 +211,7 @@ class Settings extends React.Component {
                 <p className="help">{githubValidationMessage}</p>
               </div>
               <div className="muted">
+                <p><strong>Quick Start:</strong> Paste a Github link into the box and the host will be extracted</p>
                 <p><strong>How this works:</strong> When you visit a Pull Request link on Github, a regex scan for tickets (e.g. HSI-123) is done on the branch name, title and finally description. </p>
                 <p>It tries to pull out information about the best matched ticket and allows you to transition the card.</p>
                 <p>Access to your Github host is required to inject the UI.</p>
