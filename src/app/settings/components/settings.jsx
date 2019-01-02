@@ -67,8 +67,25 @@ class Settings extends React.Component {
 
   onGithubURLChange(event) {
     const { target: { value } } = event;
-    event.preventDefault();
-    this.props.onGithubURLChange(value.trim());
+    let cleanedValue = value.trim();
+    if(value.includes('http')) {
+      try {
+        const { hostname } = new URL(cleanedValue);
+        this.props.onGithubURLChange(hostname);
+      } catch (e) {
+        this.props.onGithubURLChange(cleanedValue);
+      }
+    } else {
+      this.props.onGithubURLChange(cleanedValue);
+    }
+  }
+
+  onGithubURLPaste(event) {
+    const { target: { value } } = event;
+    try {
+
+    } catch (e) {
+    }
   }
 
   onRequestGithubPermissions(event) {
@@ -179,8 +196,8 @@ class Settings extends React.Component {
                     type="text"
                     className="input has-text-right"
                     placeholder={githubURLPlaceholder}
-                    value={githubURL || ''}
                     onChange={this.onGithubURLChange}
+                    value={githubURL || ''}
                   />
                   <span className="icon is-right">
                     <FontAwesomeIcon icon={githubValidationIcon} color={githubValidationColor} />
