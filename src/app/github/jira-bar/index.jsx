@@ -25,14 +25,15 @@ const statusStyles = {
   border: '1px solid rgb(209, 213, 218)',
   borderRadius: '3px',
   padding: '0.25rem 0.5rem',
+  marginTop: '-0.25rem',
+  maxWidth: '10rem',
   verticalAlign: 'top' // required by the ellipsis in truncate https://stackoverflow.com/questions/23529369/why-does-x-overflowhidden-cause-extra-space-below
 };
 
 const transitionListStyles = {
   display: 'inline-block',
   listStyle: 'none',
-  float: 'right',
-  marginTop: '-0.25rem'
+  float: 'right'
 };
 
 const transitionListItemStyles = {
@@ -58,7 +59,8 @@ const truncate = {
 };
 
 const cardTitleStyles = {
-  width: '460px'
+  maxWidth: '450px',
+  marginRight: '0.5rem'
 };
 
 const avatarStyles = {
@@ -148,7 +150,7 @@ class JiraBar extends React.Component {
     return (
       <div className="jira-bar" style={baseStyles}>
         <div style={{...headingStyles, ...commonSpacing}}>
-          <span style={statusStyles}>
+          <span style={{...statusStyles, ...truncate}}>
             { avatarUrl && <img title={assignedUserName} src={avatarUrl} style={avatarStyles}/> }
             { status.name }
           </span>
