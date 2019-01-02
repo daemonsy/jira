@@ -6,6 +6,7 @@ const textSearchQueryComponent = text =>
 const buildQuery = options =>
   Object
     .keys(options)
+    .filter(Boolean)
     .map(key => `${key}=${encodeURIComponent(options[key])}`)
     .join('&')
 
