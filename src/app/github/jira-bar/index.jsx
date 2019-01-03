@@ -60,6 +60,7 @@ const truncate = {
 
 const cardTitleStyles = {
   maxWidth: '450px',
+  verticalAlign: 'middle',
   marginRight: '0.5rem'
 };
 
@@ -67,7 +68,7 @@ const avatarStyles = {
   borderRadius: '3px',
   height: '1rem',
   marginRight: '0.25rem',
-  marginBottom: '0.1rem'
+  verticalAlign: 'middle'
 };
 
 const SHORT_DESCRIPTION_LENGTH = 135;
