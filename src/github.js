@@ -30,16 +30,18 @@ const getTicketMatches = () => {
 const initializeDOM = e => {
   const navbar = document.querySelector(pullRequestNavbarContainerSelector);
   if(!navbar) { return; }
-  const container = document.getElementById(containerID);
-  if(container) { return; }
+  if(document.getElementById(containerID)) { return; }
+
+  const container = document.createElement('div');
+  container.id = containerID;
+  navbar.insertAdjacentElement('beforebegin', container);
 
   get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
     if(!jiraSubdomain) { return; }
     const ticketMatches = getTicketMatches();
     const jiraClient = getClientInstance(jiraSubdomain);
-    const container = document.createElement('div');
-    container.id = containerID;
-    navbar.insertAdjacentElement('beforebegin', container);
+
+    console.debug('injecting ', container.id);
 
     injectJiraBarAboveConversation(container, { jiraClient, ticketMatches});
   });
