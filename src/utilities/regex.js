@@ -1,1 +1,1 @@
-export const pullRequestURL = /pull\/\d+$/;
+export const pullRequestURL = /pull\/\d+/;

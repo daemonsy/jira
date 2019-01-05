@@ -3,14 +3,17 @@ import { get } from '../storage';
 import { pullRequestURL } from '../../utilities/regex';
 import githubFeaturePermissions from '../permissions/github-feature';
 
-const injectContentScriptHandler = (tabId, { status }, tab) => {
+let executingInjections = {};
+
+const injectContentScriptHandler = (tabId, changes, tab) => {
   get(['githubURL']).then(({ githubURL }) => {
-    if (!githubURL || status !== 'complete') return;
-    if (tab.url.includes(githubURL) && pullRequestURL.test(tab.url)) {
-      chrome.tabs.executeScript({ file: 'github.js' });
+    if (!githubURL || changes.status !== 'complete') return;
+    if (tab.url.includes(githubURL) && pullRequestURL.test(tab.url) && !executingInjections[tabId]) {
+      executingInjections[tabId] = true;
+      chrome.tabs.executeScript({ file: 'github.js' }, () => executingInjections[tabId] = false);
     }
   });
-}
+};
 
 const jiraAPIInterceptHandler = ({ requestHeaders }) => {
   const extensionUserAgent = `chrome-jira-extension-${chrome.runtime.id}`;
@@ -28,11 +31,10 @@ const manageGithubInjectLifecycle = ({ githubURL }) => {
     }
 
     if((!githubURL || !result) && hasExistingListener) {
-
       chrome.tabs.onUpdated.removeListener(injectContentScriptHandler);
     }
   });
-}
+};
 
 const manageJiraAPIInterceptLifecycle = () => {
   get(['githubURL', 'jiraSubdomain']).then(({ githubURL, jiraSubdomain }) => {
@@ -51,7 +53,7 @@ const manageJiraAPIInterceptLifecycle = () => {
       manageGithubInjectLifecycle({ githubURL })
     });
   });
-}
+};
 
 export default chrome => {
   chrome.storage.onChanged
