@@ -41,8 +41,6 @@ const initializeDOM = e => {
     const ticketMatches = getTicketMatches();
     const jiraClient = getClientInstance(jiraSubdomain);
 
-    console.debug('injecting ', container.id);
-
     injectJiraBarAboveConversation(container, { jiraClient, ticketMatches});
   });
 }
