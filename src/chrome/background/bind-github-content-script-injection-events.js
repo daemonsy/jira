@@ -60,9 +60,11 @@ export default chrome => {
     .addListener(({ githubURL: { newValue: githubURL } = {}}, namespace) => manageGithubInjectLifecycle({ githubURL }));
 
   chrome.permissions.onAdded.addListener(manageJiraAPIInterceptLifecycle);
-
   chrome.permissions.onRemoved.addListener(manageJiraAPIInterceptLifecycle);
 
   get(['githubURL'])
-    .then(({ githubURL }) => manageGithubInjectLifecycle({ githubURL }));
+    .then(({ githubURL }) => {
+      manageJiraAPIInterceptLifecycle();
+      manageGithubInjectLifecycle({ githubURL });
+    });
 };
