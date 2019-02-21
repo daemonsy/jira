@@ -7,5 +7,5 @@ steps:
   environment:
     NODE_OPTIONS: '--experimental-modules'
   commands:
-  - npm install
-  - npm test
+  - yarn install
+  - yarn test
