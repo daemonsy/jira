@@ -4,7 +4,8 @@ name: default
 steps:
 - name: frontend
   image: node:11
+  environment:
+    NODE_OPTIONS: '--experimental-modules'
   commands:
-
   - npm install
   - npm test
