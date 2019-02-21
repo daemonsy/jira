@@ -3,7 +3,7 @@ name: default
 
 steps:
 - name: frontend
-  image: node:11.10.0-alpine
+  image: node:10.15.1-alpine
   commands:
   - rm -rf node_modules
   - npm install
