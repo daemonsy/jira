@@ -4,9 +4,7 @@ name: default
 steps:
 - name: frontend
   image: node:10
-  environment:
-    NODE_OPTIONS: '--experimental-modules'
   commands:
-  - rm -rf node_modules
+
   - yarn install
   - yarn test
