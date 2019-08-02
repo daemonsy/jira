@@ -45,14 +45,14 @@ const jsRule = {
     options: {
       babelrc: false,
       presets: [
+        "@babel/preset-react",
         ['@babel/preset-env', {
           modules: false,
           targets: {
             browsers: 'last 10 Chrome versions',
           },
         }]
-      ],
-      plugins: [require('babel-plugin-transform-react-jsx')]
+      ]
     }
   },
 }
