@@ -2652,10 +2652,10 @@ eslint-scope@^4.0.0:
     esrecurse "^4.1.0"
     estraverse "^4.1.1"
 
-esm@^3.0.21:
-  version "3.0.21"
-  resolved "https://registry.yarnpkg.com/esm/-/esm-3.0.21.tgz#0297c73d0fceb40e298c0ea9ac4ab14a21b2f948"
-  integrity sha512-ewOT07Na+f64B/Nq2itaYNAbdAg8TWRK10LLe2A4VN3+4IdUCU26pqjasXyFwnakl7QN3q1qhYIDiXs2tzXE5w==
+esm@^3.1.0:
+  version "3.2.25"
+  resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.25.tgz#342c18c29d56157688ba5ce31f8431fbb795cc10"
+  integrity sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==
 
 esprima@^4.0.0:
   version "4.0.1"
