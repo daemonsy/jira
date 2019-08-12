@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "webpack --watch-stdin --progress --color",
-    "test": "NODE_OPTIONS='--experimental-modules' tape -r esm 'tests/**/*.test.mjs' | tap-spec",
+    "test": "tape -r esm 'tests/**/*.test.js' | tap-spec",
     "clean": "rm -rf dist && rm -f extension.zip",
     "pack": "zip -r extension.zip ./dist",
     "build:dist": "yarn run clean && NODE_ENV=production webpack --bail",
