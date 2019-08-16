@@ -3,15 +3,17 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const environment = process.env.NODE_ENV || 'development';
-const extensionDirectory = path.resolve(__dirname, environment === 'production' ? './dist' : './build');
+const extensionDirectory = path.resolve(
+  __dirname,
+  environment === 'production' ? './dist' : './build'
+);
 const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
+const inProduction = process.env.NODE_ENV === 'production';
 
 console.log(`Running webpack in ${environment} mode`);
-
-const inProduction = process.env.NODE_ENV === 'production';
 
 const backgroundPage = new HtmlWebpackPlugin({
   title: null,
@@ -45,17 +47,20 @@ const jsRule = {
     options: {
       babelrc: false,
       presets: [
-        "@babel/preset-react",
-        ['@babel/preset-env', {
-          modules: false,
-          targets: {
-            browsers: 'last 10 Chrome versions',
-          },
-        }]
+        '@babel/preset-react',
+        [
+          '@babel/preset-env',
+          {
+            modules: false,
+            targets: {
+              browsers: 'last 10 Chrome versions'
+            }
+          }
+        ]
       ]
     }
-  },
-}
+  }
+};
 
 const plugins = [
   backgroundPage,
@@ -63,28 +68,34 @@ const plugins = [
   optionsPage,
   new CopyWebpackPlugin([
     { from: './static/manifest.json', to: extensionDirectory },
-    { from: './static/images/jira*.png', to: extensionDirectory, flatten: true }
+    {
+      from: `./static/images/logos/${environment}/jira*.png`,
+      to: extensionDirectory,
+      flatten: true
+    }
   ]),
   new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(environment || 'development')
+    'process.env.NODE_ENV': JSON.stringify(environment)
   }),
   new MiniCssExtractPlugin({
-    filename: "[name].css"
+    filename: '[name].css'
   })
 ];
 
 if (!inProduction) {
-  plugins.push(new ChromeExtensionReloader({
-    reloadPage: true,
-    entries: {
-      contentScript: 'github',
-      background: 'background'
-    }
-  }))
+  plugins.push(
+    new ChromeExtensionReloader({
+      reloadPage: true,
+      entries: {
+        contentScript: 'github',
+        background: 'background'
+      }
+    })
+  );
 }
 
 module.exports = {
-  mode: process.env.NODE_ENV || 'development',
+  mode: environment,
   devtool: false,
   optimization: {
     minimize: inProduction,
