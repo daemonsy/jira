@@ -1,16 +1,18 @@
 const webpack = require('webpack');
 const path = require('path');
+
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
+
 const environment = process.env.NODE_ENV || 'development';
 const extensionDirectory = path.resolve(
   __dirname,
   environment === 'production' ? './dist' : './build'
 );
-const ChromeExtensionReloader = require('webpack-chrome-extension-reloader');
 const inProduction = process.env.NODE_ENV === 'production';
 
 console.log(`Running webpack in ${environment} mode`);
@@ -87,7 +89,6 @@ if (!inProduction) {
     new ChromeExtensionReloader({
       reloadPage: true,
       entries: {
-        contentScript: 'github',
         background: 'background'
       }
     })
@@ -109,7 +110,6 @@ module.exports = {
     modules: false
   },
   entry: {
-    github: './src/github.js',
     popup: './src/popup.jsx',
     background: './src/background.js',
     options: './src/options.js'
