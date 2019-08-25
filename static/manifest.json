@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Jira",
-  "description": "An extension to make quick Jira jumps via the omnibox",
+  "description": "Jump straight to Jira directly from address bar shortcuts",
   "version": "2.0.3",
   "omnibox": {
     "keyword": "j"
@@ -19,16 +19,10 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [
-      "background.js"
-    ],
+    "scripts": ["background.js"],
     "persistent": true
   },
-  "permissions": [
-    "cookies",
-    "storage",
-    "https://*.atlassian.net/"
-  ],
+  "permissions": ["cookies", "storage", "https://*.atlassian.net/"],
   "optional_permissions": [
     "webRequest",
     "webRequestBlocking",
