@@ -7,8 +7,11 @@ import './styles.scss';
 
 import JiraIssues from '../jira-issues';
 
-const undoneAssignedIssuesURL = ({ jiraSubdomain }) => `https://${jiraSubdomain}.atlassian.net/rest/api/2/search?fields=summary,status&jql=`
-  + encodeURIComponent(`assignee=currentuser() AND status!="Done" ORDER BY updated DESC`);
+const undoneAssignedIssuesURL = ({ jiraSubdomain }) =>
+  `https://${jiraSubdomain}.atlassian.net/rest/api/2/search?fields=summary,status&jql=` +
+  encodeURIComponent(
+    `assignee=currentuser() AND status!="Done" ORDER BY updated DESC`
+  );
 
 class Popup extends React.Component {
   constructor(props) {
@@ -20,7 +23,7 @@ class Popup extends React.Component {
       issuesData: {},
       status: props.jiraSubdomain ? 'launched' : 'noSubdomain',
       error: null
-    }
+    };
     this.fetchIssues = this.fetchIssues.bind(this);
     this.showSettings = this.showSettings.bind(this);
   }
@@ -35,15 +38,20 @@ class Popup extends React.Component {
     if (jiraSubdomain) {
       this.setState({ status: 'fetching' });
 
-      fetch(undoneAssignedIssuesURL({ jiraSubdomain }), { credentials: 'same-origin' })
+      fetch(undoneAssignedIssuesURL({ jiraSubdomain }), {
+        credentials: 'same-origin'
+      })
         .then(response => {
-          if (!response.ok) { throw new Error(response.status) }
-          return response.json()
+          if (!response.ok) {
+            throw new Error(response.status);
+          }
+          return response.json();
         })
         .then(issuesData => {
           this.setState({ issuesData, status: 'fetched' });
-        }).catch(error => {
-          this.setState({ status: 'error', error })
+        })
+        .catch(error => {
+          this.setState({ status: 'error', error });
         });
     } else {
       this.setState(state => ({ status: 'noSubdomain' }));
@@ -65,57 +73,59 @@ class Popup extends React.Component {
 
     return (
       <div className="popup">
-        {mode === 'issues' &&
+        {mode === 'issues' && (
           <div className="jira-container panel">
-            <p className='panel-heading'>
-              <span><strong>Jira {mode}</strong></span>
+            <p className="panel-heading">
+              <span>
+                <strong>Jira {mode}</strong>
+              </span>
               <button className="settings-button" onClick={this.showSettings}>
                 <FontAwesomeIcon icon={cog} />
               </button>
-              {status === 'fetched' &&
+              {status === 'fetched' && (
                 <span style={{ float: 'right' }}>
-                  {issues.length === total ? `Showing all ${total}` : `Loaded ${issues.length} out of ${total}`}
+                  {issues.length === total
+                    ? `Showing all ${total}`
+                    : `Loaded ${issues.length} out of ${total}`}
                 </span>
-              }
+              )}
             </p>
 
-            {status === 'fetching' &&
+            {status === 'fetching' && (
               <div className="message-container has-text-centered">
-                <FontAwesomeIcon
-                  className="spinner"
-                  icon={circleNotch}
-                  spin
-                />
+                <FontAwesomeIcon className="spinner" icon={circleNotch} spin />
                 <span>Fetching issues...</span>
               </div>
-            }
+            )}
 
-            {status === 'fetched' &&
+            {status === 'fetched' && (
               <JiraIssues
                 chrome={chrome}
                 issues={issues}
                 jiraSubdomain={jiraSubdomain}
                 total={total}
               />
-            }
+            )}
 
-            {status === 'noSubdomain' &&
+            {status === 'noSubdomain' && (
               <div className="message-container has-text-centered">
-                <span>Please enter your Jira subdomain under <a onClick={this.showSettings}>Settings</a>.</span>
+                <span>
+                  Please enter your Jira subdomain under{' '}
+                  <a onClick={this.showSettings}>Settings</a>.
+                </span>
               </div>
-            }
+            )}
 
-            {status === 'error' &&
+            {status === 'error' && (
               <div className="section message is-danger">
                 <div className="message-body">
-                  An error occurred while fetching issues. You might not be logged in.
-
-                  Error Status: {error.message}
+                  An error occurred while fetching issues. You might not be
+                  logged in. Error Status: {error.message}
                 </div>
               </div>
-            }
+            )}
           </div>
-        }
+        )}
       </div>
     );
   }

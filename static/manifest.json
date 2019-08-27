@@ -13,20 +13,25 @@
     "64": "jira64.png",
     "128": "jira128.png"
   },
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "browser_style": true,
+    "chrome_style": false
+  },
   "browser_action": {
     "default_title": "Issues",
     "default_popup": "popup.html"
   },
+
   "background": {
     "scripts": ["background.js"],
     "persistent": true
   },
   "permissions": ["cookies", "storage", "https://*.atlassian.net/"],
-  "optional_permissions": [
-    "webRequest",
-    "webRequestBlocking",
-    "tabs",
-    "*://*/*"
-  ]
+  "optional_permissions": ["tabs", "*://*/*"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "jira@example.com"
+    }
+  }
 }
