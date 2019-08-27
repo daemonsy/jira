@@ -1,8 +1,9 @@
 import React from 'react';
-import { apiIssuePath } from '../../../jira/paths.mjs';
+import { apiIssuePath } from '../../../jira/paths.js';
 
 // Copied from document.querySelector('.js-discussion .timeline-comment-header span.timeline-comment-label')
-const classes = 'timeline-comment-label text-bold tooltipped tooltipped-multiline tooltipped-s';
+const classes =
+  'timeline-comment-label text-bold tooltipped tooltipped-multiline tooltipped-s';
 
 class JiraIssueLabel extends React.Component {
   constructor(props) {
@@ -10,7 +11,7 @@ class JiraIssueLabel extends React.Component {
 
     this.state = {
       issue: null
-    }
+    };
 
     this.goToTicket = this.goToTicket.bind(this);
   }
@@ -28,22 +29,22 @@ class JiraIssueLabel extends React.Component {
 
     jiraClient.get(apiIssuePath, ticket).then(issue => {
       this.setState({ issue });
-    })
+    });
   }
 
   render() {
     const { ticket } = this.props;
     const { issue } = this.state;
 
-    return (
-      ticket ? <span
+    return ticket ? (
+      <span
         className={classes}
         onClick={this.goToTicket}
-        aria-label={ issue ? issue.fields.summary : null }
+        aria-label={issue ? issue.fields.summary : null}
       >
         View {ticket}
-      </span> : null
-    )
+      </span>
+    ) : null;
   }
 }
 
