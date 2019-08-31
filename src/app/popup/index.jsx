@@ -2,15 +2,16 @@ import React from 'react';
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import cog from '@fortawesome/fontawesome-free-solid/faCog';
 import circleNotch from '@fortawesome/fontawesome-free-solid/faCircleNotch';
+import { JIRA_DOMAIN } from '../../config/constants';
 
 import './styles.scss';
 
 import JiraIssues from '../jira-issues';
 
 const undoneAssignedIssuesURL = ({ jiraSubdomain }) =>
-  `https://${jiraSubdomain}.atlassian.net/rest/api/2/search?fields=summary,status&jql=` +
+  `https://${jiraSubdomain}.${JIRA_DOMAIN}/rest/api/2/search?fields=summary,status&jql=` +
   encodeURIComponent(
-    `assignee=currentuser() AND status!="Done" ORDER BY updated DESC`
+    `assignee=currentuser() AND statusCategory != Done AND resolution IS EMPTY ORDER BY updated DESC`
   );
 
 class Popup extends React.Component {

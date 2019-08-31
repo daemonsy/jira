@@ -3,8 +3,8 @@ import './popup.scss';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { get } from './chrome/storage';
-import getCookieDomains from './chrome/get-cookie-domains';
+import { get } from './browser/storage';
+import getCookieDomains from './browser/get-cookie-domains';
 
 import Popup from './app/popup';
 

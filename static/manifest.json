@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Jira",
   "description": "Jump straight to Jira directly from address bar shortcuts",
-  "version": "2.0.3",
+  "version": "3.0.0",
   "omnibox": {
     "keyword": "j"
   },
@@ -15,8 +15,9 @@
   },
   "options_ui": {
     "page": "options.html",
-    "browser_style": true,
-    "chrome_style": false
+    "browser_style": false,
+    "chrome_style": false,
+    "open_in_tab": true
   },
   "browser_action": {
     "default_title": "Issues",
@@ -27,8 +28,7 @@
     "scripts": ["background.js"],
     "persistent": true
   },
-  "permissions": ["cookies", "storage", "https://*.atlassian.net/"],
-  "optional_permissions": ["tabs", "*://*/*"],
+  "optional_permissions": ["cookies", "storage", "http://*/", "https://*/"],
   "browser_specific_settings": {
     "gecko": {
       "id": "jira@example.com"

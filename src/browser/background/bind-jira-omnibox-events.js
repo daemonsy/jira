@@ -7,6 +7,8 @@ import {
   apiIssuePath,
   apiProjectPath,
   pageSearchIssuesPath,
+  pageIssuePath,
+  pageProjectPath
 } from '../../jira/paths';
 
 export default chrome => {
@@ -25,7 +27,9 @@ export default chrome => {
   };
 
   const makeJiraApiCall = url =>
-    fetch(url, { credentials: 'same-origin' }).then(response => response.json());
+    fetch(url, { credentials: 'same-origin' }).then(response =>
+      response.json()
+    );
 
   const showDefaultSuggestion = description =>
     chrome.omnibox.setDefaultSuggestion({
@@ -36,9 +40,7 @@ export default chrome => {
     const apiSearchIssuesURL = buildHelper(subdomain, apiSearchIssuesPath);
 
     showDefaultSuggestion(`Search for ${input}...`);
-    makeJiraApiCall(apiSearchIssuesURL(input), {
-      credentials: 'same-origin'
-    }).then(({ issues = [] }) => {
+    makeJiraApiCall(apiSearchIssuesURL(input)).then(({ issues = [] }) => {
       const suggestions = issues.map(({ key, fields: { summary } }) => ({
         content: key,
         description: escapeEntities(`${key}: ${summary}`)
@@ -50,13 +52,23 @@ export default chrome => {
   const displayProjectSuggestion = (key, suggest, subdomain) => {
     const apiProjectURL = buildHelper(subdomain, apiProjectPath);
     showDefaultSuggestion(`Open project ${key}`);
-    makeJiraApiCall(apiProjectURL(key)).then(({ name, key: foundKey, description, errorMessages = [] }) => {
-      if (errorMessages.length) {
-        showDefaultSuggestion(`Open project ${key}. Heads up, no project found with this key :(`);
-      } else {
-        showDefaultSuggestion(escapeEntities(`Open project ${foundKey}: ${[name, description].filter(Boolean).join(" - ")}`));
+    makeJiraApiCall(apiProjectURL(key)).then(
+      ({ name, key: foundKey, description, errorMessages = [] }) => {
+        if (errorMessages.length) {
+          showDefaultSuggestion(
+            `Open project ${key}. Heads up, no project found with this key :(`
+          );
+        } else {
+          showDefaultSuggestion(
+            escapeEntities(
+              `Open project ${foundKey}: ${[name, description]
+                .filter(Boolean)
+                .join(' - ')}`
+            )
+          );
+        }
       }
-    });
+    );
   };
 
   const displayTicketSuggestion = (key, suggest, subdomain) => {
@@ -73,7 +85,9 @@ export default chrome => {
             summary,
             status: { name }
           } = fields;
-          showDefaultSuggestion(escapeEntities(`Open issue ${foundKey}: [${name}] ${summary}`))
+          showDefaultSuggestion(
+            escapeEntities(`Open issue ${foundKey}: [${name}] ${summary}`)
+          );
         }
       }
     );
@@ -120,12 +134,14 @@ export default chrome => {
         let url;
         switch (type) {
           case 'issue': {
-            url = `https://${jiraSubdomain}.atlassian.net/browse/${text}`;
+            const pageIssueURL = buildHelper(jiraSubdomain, pageIssuePath);
+            url = pageIssueURL(text);
             break;
           }
 
           case 'project': {
-            url = `https://${jiraSubdomain}.atlassian.net/projects/${text}`;
+            const pageProjectURL = buildHelper(jiraSubdomain, pageProjectPath);
+            url = pageProjectURL(text);
             break;
           }
 
