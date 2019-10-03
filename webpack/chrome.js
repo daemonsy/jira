@@ -29,16 +29,16 @@ const jsRule = {
   }
 };
 
-// if (!inProduction) {
-//   plugins.push(
-//     new ChromeExtensionReloader({
-//       reloadPage: true,
-//       entries: {
-//         background: 'background'
-//       }
-//     })
-//   );
-// }
+if (!inProduction) {
+  plugins.push(
+    new ChromeExtensionReloader({
+      reloadPage: true,
+      entries: {
+        background: 'background'
+      }
+    })
+  );
+}
 
 module.exports = merge(baseConfig('chrome'), {
   module: {
