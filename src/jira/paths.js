@@ -1,5 +1,3 @@
-import { JIRA_DOMAIN } from '../config/constants';
-
 const textSearchQueryComponent = text =>
   `text ~ "${text}" AND status!="Done" ORDER BY lastViewed DESC`;
 
@@ -9,7 +7,7 @@ const buildQuery = options =>
     .map(key => `${key}=${encodeURIComponent(options[key])}`)
     .join('&');
 
-export const buildBaseURL = subdomain => `https://${subdomain}.${JIRA_DOMAIN}`;
+export const buildBaseURL = jiraHost => jiraHost;
 
 export const apiSearchIssuesPath = (
   text,

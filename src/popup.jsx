@@ -12,9 +12,9 @@ const root = document.createElement('div');
 document.body.append(root);
 
 setTimeout(() => {
-  Promise.all([get(['jiraSubdomain']), getCookieDomains()]).then(
-    ([{ jiraSubdomain }]) => {
-      ReactDOM.render(<Popup jiraSubdomain={jiraSubdomain} />, root);
+  Promise.all([get(['jiraHost']), getCookieDomains()]).then(
+    ([{ jiraHost }]) => {
+      ReactDOM.render(<Popup jiraHost={jiraHost} />, root);
     }
   );
 }, 150);

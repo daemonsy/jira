@@ -94,10 +94,10 @@ export default chrome => {
   };
 
   const onInputChangedHandler = debounce((rawInput, suggest) => {
-    get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
+    get(['jiraHost']).then(({ jiraHost }) => {
       const input = (rawInput || '').trim().toUpperCase();
 
-      if (!jiraSubdomain) {
+      if (!jiraHost) {
         showDefaultSuggestion(messages.noSubdomain);
         return;
       }
@@ -105,15 +105,15 @@ export default chrome => {
       const { type, text } = ticketMatch(input);
       switch (type) {
         case 'issue': {
-          return displayTicketSuggestion(text, suggest, jiraSubdomain);
+          return displayTicketSuggestion(text, suggest, jiraHost);
         }
 
         case 'project': {
-          return displayProjectSuggestion(text, suggest, jiraSubdomain);
+          return displayProjectSuggestion(text, suggest, jiraHost);
         }
       }
       if (input.length > 2) {
-        displayRelevantSuggestions(input, suggest, jiraSubdomain);
+        displayRelevantSuggestions(input, suggest, jiraHost);
       } else {
         showDefaultSuggestion(messages.typeMore);
       }
@@ -121,33 +121,35 @@ export default chrome => {
   }, 200);
 
   chrome.omnibox.onInputEntered.addListener((input, disposition) => {
-    get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
-      if (!jiraSubdomain) {
+    get(['jiraHost']).then(({ jiraHost }) => {
+      if (!jiraHost) {
         chrome.runtime.openOptionsPage();
         return;
       }
 
-      if (input && !!input.trim() && jiraSubdomain) {
+      if (input && !!input.trim() && jiraHost) {
         const key = input.trim().toUpperCase();
         const { type, text } = ticketMatch(key);
 
         let url;
         switch (type) {
           case 'issue': {
-            const pageIssueURL = buildHelper(jiraSubdomain, pageIssuePath);
+            const pageIssueURL = buildHelper(jiraHost, pageIssuePath);
+
             url = pageIssueURL(text);
             break;
           }
 
           case 'project': {
-            const pageProjectURL = buildHelper(jiraSubdomain, pageProjectPath);
+            const pageProjectURL = buildHelper(jiraHost, pageProjectPath);
+
             url = pageProjectURL(text);
             break;
           }
 
           default: {
             const pageSearchIssuesURL = buildHelper(
-              jiraSubdomain,
+              jiraHost,
               pageSearchIssuesPath
             );
             url = pageSearchIssuesURL(input);

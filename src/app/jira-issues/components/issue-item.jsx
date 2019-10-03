@@ -1,13 +1,12 @@
 import React from 'react';
 import { JIRA_DOMAIN } from '../../../config/constants';
 
-const issueURL = ({ jiraSubdomain, key }) =>
-  `https://${jiraSubdomain}.${JIRA_DOMAIN}/browse/${key}`;
+const issueURL = ({ jiraHost, key }) => `https://${jiraHost}/browse/${key}`;
 
-const IssueItem = ({ issue, onClick, jiraSubdomain }) => {
+const IssueItem = ({ issue, onClick, jiraHost }) => {
   return (
     <a
-      href={issueURL({ jiraSubdomain, key: issue.key })}
+      href={issueURL({ jiraHost, key: issue.key })}
       className="panel-block"
       onClick={onClick}
     >

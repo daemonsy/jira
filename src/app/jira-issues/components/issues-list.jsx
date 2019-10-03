@@ -48,7 +48,7 @@ class IssuesList extends React.Component {
 
   render() {
     const { filter } = this.state;
-    const { issues, jiraSubdomain } = this.props;
+    const { issues, jiraHost } = this.props;
 
     return (
       <div className="issues-list">
@@ -72,7 +72,7 @@ class IssuesList extends React.Component {
             key={issue.key}
             issue={issue}
             onClick={this.openIssue}
-            jiraSubdomain={jiraSubdomain}
+            jiraHost={jiraHost}
           />
         ))}
       </div>

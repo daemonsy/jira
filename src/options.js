@@ -17,7 +17,6 @@ const setJiraHostAndRequestPermissions = jiraHost => {
   browser.permissions.request(
     jiraDomainPermissions({ jiraHost }),
     jiraDomainGranted => {
-      debugger;
       set({ jiraHost }).then(() => render({ jiraDomainGranted }));
     }
   );

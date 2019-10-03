@@ -89,11 +89,11 @@ class Settings extends React.Component {
   }
 
   currentMode(props) {
-    const { jiraSubdomain, foundDomains } = props;
+    const { jiraHost, foundDomains } = props;
     const { pristine } = this.state;
 
     switch (true) {
-      case !!jiraSubdomain: {
+      case !!jiraHost: {
         return 'settings';
       }
 
