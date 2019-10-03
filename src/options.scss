@@ -1,13 +1,13 @@
-@import "~bulma/sass/utilities/_all";
-@import "~bulma/sass/base/_all";
-@import "~bulma/sass/elements/form";
-@import "~bulma/sass/elements/button";
-@import "~bulma/sass/elements/title";
-@import "~bulma/sass/elements/icon";
+@import '~bulma/sass/utilities/_all';
+@import '~bulma/sass/base/_all';
+@import '~bulma/sass/elements/form';
+@import '~bulma/sass/elements/button';
+@import '~bulma/sass/elements/title';
+@import '~bulma/sass/elements/icon';
 
 .options-wrapper {
   margin: 3rem auto;
-  border: 1px solid #EEE;
+  border: 1px solid #eee;
   border-radius: 3px;
   width: 500px;
   min-height: 400px;
@@ -42,4 +42,14 @@
 .close-button {
   text-align: center;
   width: 100%;
+}
+
+.settings-form {
+  label {
+    &.radio {
+      input {
+        margin-right: 0.5rem;
+      }
+    }
+  }
 }

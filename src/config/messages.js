@@ -1,0 +1,1 @@
+export const FETCH_JIRA_ISSUE = 'FETCH_JIRA_ISSUE';

@@ -7,6 +7,8 @@ import {
   apiIssuePath,
   apiProjectPath,
   pageSearchIssuesPath,
+  pageIssuePath,
+  pageProjectPath
 } from '../../jira/paths';
 
 export default chrome => {
@@ -25,7 +27,9 @@ export default chrome => {
   };
 
   const makeJiraApiCall = url =>
-    fetch(url, { credentials: 'same-origin' }).then(response => response.json());
+    fetch(url, { credentials: 'same-origin' }).then(response =>
+      response.json()
+    );
 
   const showDefaultSuggestion = description =>
     chrome.omnibox.setDefaultSuggestion({
@@ -36,9 +40,7 @@ export default chrome => {
     const apiSearchIssuesURL = buildHelper(subdomain, apiSearchIssuesPath);
 
     showDefaultSuggestion(`Search for ${input}...`);
-    makeJiraApiCall(apiSearchIssuesURL(input), {
-      credentials: 'same-origin'
-    }).then(({ issues = [] }) => {
+    makeJiraApiCall(apiSearchIssuesURL(input)).then(({ issues = [] }) => {
       const suggestions = issues.map(({ key, fields: { summary } }) => ({
         content: key,
         description: escapeEntities(`${key}: ${summary}`)
@@ -50,13 +52,23 @@ export default chrome => {
   const displayProjectSuggestion = (key, suggest, subdomain) => {
     const apiProjectURL = buildHelper(subdomain, apiProjectPath);
     showDefaultSuggestion(`Open project ${key}`);
-    makeJiraApiCall(apiProjectURL(key)).then(({ name, key: foundKey, description, errorMessages = [] }) => {
-      if (errorMessages.length) {
-        showDefaultSuggestion(`Open project ${key}. Heads up, no project found with this key :(`);
-      } else {
-        showDefaultSuggestion(escapeEntities(`Open project ${foundKey}: ${[name, description].filter(Boolean).join(" - ")}`));
+    makeJiraApiCall(apiProjectURL(key)).then(
+      ({ name, key: foundKey, description, errorMessages = [] }) => {
+        if (errorMessages.length) {
+          showDefaultSuggestion(
+            `Open project ${key}. Heads up, no project found with this key :(`
+          );
+        } else {
+          showDefaultSuggestion(
+            escapeEntities(
+              `Open project ${foundKey}: ${[name, description]
+                .filter(Boolean)
+                .join(' - ')}`
+            )
+          );
+        }
       }
-    });
+    );
   };
 
   const displayTicketSuggestion = (key, suggest, subdomain) => {
@@ -73,17 +85,19 @@ export default chrome => {
             summary,
             status: { name }
           } = fields;
-          showDefaultSuggestion(escapeEntities(`Open issue ${foundKey}: [${name}] ${summary}`))
+          showDefaultSuggestion(
+            escapeEntities(`Open issue ${foundKey}: [${name}] ${summary}`)
+          );
         }
       }
     );
   };
 
   const onInputChangedHandler = debounce((rawInput, suggest) => {
-    get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
+    get(['jiraHost']).then(({ jiraHost }) => {
       const input = (rawInput || '').trim().toUpperCase();
 
-      if (!jiraSubdomain) {
+      if (!jiraHost) {
         showDefaultSuggestion(messages.noSubdomain);
         return;
       }
@@ -91,15 +105,15 @@ export default chrome => {
       const { type, text } = ticketMatch(input);
       switch (type) {
         case 'issue': {
-          return displayTicketSuggestion(text, suggest, jiraSubdomain);
+          return displayTicketSuggestion(text, suggest, jiraHost);
         }
 
         case 'project': {
-          return displayProjectSuggestion(text, suggest, jiraSubdomain);
+          return displayProjectSuggestion(text, suggest, jiraHost);
         }
       }
       if (input.length > 2) {
-        displayRelevantSuggestions(input, suggest, jiraSubdomain);
+        displayRelevantSuggestions(input, suggest, jiraHost);
       } else {
         showDefaultSuggestion(messages.typeMore);
       }
@@ -107,31 +121,35 @@ export default chrome => {
   }, 200);
 
   chrome.omnibox.onInputEntered.addListener((input, disposition) => {
-    get(['jiraSubdomain']).then(({ jiraSubdomain }) => {
-      if (!jiraSubdomain) {
+    get(['jiraHost']).then(({ jiraHost }) => {
+      if (!jiraHost) {
         chrome.runtime.openOptionsPage();
         return;
       }
 
-      if (input && !!input.trim() && jiraSubdomain) {
+      if (input && !!input.trim() && jiraHost) {
         const key = input.trim().toUpperCase();
         const { type, text } = ticketMatch(key);
 
         let url;
         switch (type) {
           case 'issue': {
-            url = `https://${jiraSubdomain}.atlassian.net/browse/${text}`;
+            const pageIssueURL = buildHelper(jiraHost, pageIssuePath);
+
+            url = pageIssueURL(text);
             break;
           }
 
           case 'project': {
-            url = `https://${jiraSubdomain}.atlassian.net/projects/${text}`;
+            const pageProjectURL = buildHelper(jiraHost, pageProjectPath);
+
+            url = pageProjectURL(text);
             break;
           }
 
           default: {
             const pageSearchIssuesURL = buildHelper(
-              jiraSubdomain,
+              jiraHost,
               pageSearchIssuesPath
             );
             url = pageSearchIssuesURL(input);

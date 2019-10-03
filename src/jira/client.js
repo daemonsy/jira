@@ -1,19 +1,20 @@
-import { buildHelper, buildBaseURL } from './paths';
+import { buildHelper, buildBaseURL, pageIssuePath } from './paths';
 
 export const getClientInstance = jiraSubdomain => {
   return {
     get(path, ...args) {
       const urlHelper = buildHelper(jiraSubdomain, path);
 
-      return fetch(urlHelper.apply(undefined, args), { credentials: 'same-origin' })
-        .then(response => response.json());
+      return fetch(urlHelper.apply(undefined, args), {
+        credentials: 'same-origin'
+      }).then(response => response.json());
     },
 
     post(path, body) {
       const url = `${buildBaseURL(jiraSubdomain)}${path}`;
       const headers = new Headers({
         'Content-Type': 'application/json',
-        'Origin': `https://${jiraSubdomain}.atlassian.net`,
+        Origin: buildBaseURL(jiraSubdomain),
         'User-Agent': 'jira/extension/2.0'
       });
 
@@ -22,12 +23,11 @@ export const getClientInstance = jiraSubdomain => {
         method: 'POST',
         headers,
         body: JSON.stringify(body)
-      })
+      });
     },
 
     issueURL(key) {
-      return `https://${jiraSubdomain}.atlassian.net/browse/${key}`;
+      return `${buildBaseURL(jiraSubdomain)}${pageIssuePath(key)}`;
     }
-
-  }
-}
+  };
+};

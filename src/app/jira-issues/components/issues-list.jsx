@@ -9,14 +9,16 @@ import faSearch from '@fortawesome/fontawesome-free-solid/faSearch';
 const searchFilter = (issues, text) => {
   const cleanedText = text.trim().toLowerCase();
 
-  const results = cleanedText ?
-    issues.filter(issue =>
-      issue.fields.summary.toLowerCase().indexOf(cleanedText) !== -1 ||
-      issue.key.toLowerCase().indexOf(cleanedText) !== -1)
+  const results = cleanedText
+    ? issues.filter(
+        issue =>
+          issue.fields.summary.toLowerCase().indexOf(cleanedText) !== -1 ||
+          issue.key.toLowerCase().indexOf(cleanedText) !== -1
+      )
     : issues;
 
   return results;
-}
+};
 
 class IssuesList extends React.Component {
   constructor(props) {
@@ -37,14 +39,16 @@ class IssuesList extends React.Component {
   }
 
   filterIssues(event) {
-    const { currentTarget: { value } } = event;
+    const {
+      currentTarget: { value }
+    } = event;
 
     this.setState({ filter: value });
   }
 
   render() {
     const { filter } = this.state;
-    const { issues, total, jiraSubdomain } = this.props;
+    const { issues, jiraHost } = this.props;
 
     return (
       <div className="issues-list">
@@ -63,16 +67,16 @@ class IssuesList extends React.Component {
           </p>
         </div>
 
-        {searchFilter(issues, filter).map(issue =>
+        {searchFilter(issues, filter).map(issue => (
           <IssueItem
             key={issue.key}
             issue={issue}
             onClick={this.openIssue}
-            jiraSubdomain={jiraSubdomain}
-          />)
-        }
+            jiraHost={jiraHost}
+          />
+        ))}
       </div>
-    )
+    );
   }
 }
 

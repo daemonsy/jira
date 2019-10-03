@@ -1,11 +1,14 @@
 import React from 'react';
+import cx from 'classnames';
+
 import FontAwesomeIcon from '@fortawesome/react-fontawesome';
 import check from '@fortawesome/fontawesome-free-solid/faCheck';
 import times from '@fortawesome/fontawesome-free-solid/faTimes';
 import exclaimationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
-import PropTypes from 'prop-types';
 
-const subdomainPlaceholder = 'Jira subdomain, e.g. twilio';
+import extractURLHost from '../../../utilities/extract-url-host';
+
+const jiraHostPlaceholder = 'Example: https://acme.atlassian.net';
 
 const validationMessages = {
   match: 'Looks good, detected a cookie at this subdomain',
@@ -28,14 +31,14 @@ const validationColors = {
   bad: '#ff3860'
 };
 
-const validateSubdomain = (jiraSubdomain, foundDomains) => {
+const validateHost = (jiraHost, foundDomains) => {
   let status = 'bad';
 
-  if (!jiraSubdomain) {
+  if (!jiraHost) {
     status = 'blank';
-  } else if (foundDomains.indexOf(jiraSubdomain) !== -1) {
+  } else if (foundDomains.indexOf(jiraHost) !== -1) {
     status = 'match';
-  } else if (/^\w+\b$/.test(jiraSubdomain)) {
+  } else if (extractURLHost(jiraHost)) {
     status = 'goodNoCookie';
   }
 
@@ -45,16 +48,31 @@ const validateSubdomain = (jiraSubdomain, foundDomains) => {
     color: validationColors[status]
   };
 };
+
 class Settings extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      pristine: true
+      pristine: true,
+      jiraHost: props.storedJiraHost
     };
 
     this.onChange = this.onChange.bind(this);
+    this.setJiraHost = this.setJiraHost.bind(this);
     this.noLongerPristine = this.noLongerPristine.bind(this);
+  }
+
+  setJiraHost() {
+    const { jiraHost } = this.state;
+    const hostname = extractURLHost(jiraHost);
+
+    if (hostname) {
+      this.setState(
+        () => ({ jiraHost: hostname }),
+        () => this.props.setJiraHost(this.state.jiraHost)
+      );
+    }
   }
 
   onChange(event) {
@@ -62,7 +80,7 @@ class Settings extends React.Component {
       target: { value }
     } = event;
 
-    this.props.onChange(value.trim());
+    this.setState(() => ({ jiraHost: value }));
     this.noLongerPristine();
   }
 
@@ -71,11 +89,11 @@ class Settings extends React.Component {
   }
 
   currentMode(props) {
-    const { jiraSubdomain, foundDomains } = props;
+    const { jiraHost, foundDomains } = props;
     const { pristine } = this.state;
 
     switch (true) {
-      case !!jiraSubdomain: {
+      case !!jiraHost: {
         return 'settings';
       }
 
@@ -90,32 +108,32 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { jiraSubdomain, foundDomains } = this.props;
-    const { icon, message, color } = validateSubdomain(
-      jiraSubdomain,
-      foundDomains
-    );
+    const { storedJiraHost, foundDomains } = this.props;
+    const { jiraHost } = this.state;
+    const { icon, message, color } = validateHost(jiraHost, foundDomains);
     const mode = this.currentMode(this.props, this.state);
+    const hostChanged = storedJiraHost !== jiraHost;
 
     return (
       <div className="section settings">
-        <h1 className="title main-title">Jira Settings</h1>
+        <h1 className="title main-title">Settings</h1>
 
         {mode === 'settings' && (
           <React.Fragment>
             <form className="settings-form">
-              <h4 className="title is-size-4">Subdomain</h4>
+              <h4 className="title is-size-4">Jira Host</h4>
+              <p className="help">
+                <strong>Paste any Jira URL</strong> into the box or type in your
+                Jira host
+              </p>
               <div className="field has-addons" style={{ flexWrap: 'wrap' }}>
-                <div className="control">
-                  <a className="button is-static">https://</a>
-                </div>
                 <div className="control has-icons-right is-expanded">
                   <input
-                    name="jiraSubdomain"
+                    name="jiraHost"
                     type="text"
                     className="input has-text-right"
-                    placeholder={subdomainPlaceholder}
-                    value={jiraSubdomain || ''}
+                    placeholder={jiraHostPlaceholder}
+                    value={jiraHost}
                     onChange={this.onChange}
                   />
                   {icon && (
@@ -124,8 +142,24 @@ class Settings extends React.Component {
                     </span>
                   )}
                 </div>
-                <div className="control is-expanded">
-                  <a className="button is-static">.atlassian.net</a>
+                <div className="control">
+                  <button
+                    disabled={!hostChanged}
+                    type="button"
+                    onClick={this.setJiraHost}
+                    className={cx('button', {
+                      'is-primary': hostChanged
+                    })}
+                  >
+                    {hostChanged ? (
+                      'Set Host'
+                    ) : (
+                      <FontAwesomeIcon
+                        icon={check}
+                        color={validationColors['match']}
+                      />
+                    )}
+                  </button>
                 </div>
                 {message && <p className="help">{message}</p>}
               </div>
@@ -149,7 +183,7 @@ class Settings extends React.Component {
               <hr />
               <button
                 onClick={window.close}
-                className="is-primary button is-medium close-button"
+                className="button is-medium close-button"
               >
                 Close this page
               </button>

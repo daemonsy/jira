@@ -7,10 +7,10 @@ import './styles.scss';
 
 import JiraIssues from '../jira-issues';
 
-const undoneAssignedIssuesURL = ({ jiraSubdomain }) =>
-  `https://${jiraSubdomain}.atlassian.net/rest/api/2/search?fields=summary,status&jql=` +
+const undoneAssignedIssuesURL = ({ jiraHost }) =>
+  `${jiraHost}/rest/api/2/search?fields=summary,status&jql=` +
   encodeURIComponent(
-    `assignee=currentuser() AND status!="Done" ORDER BY updated DESC`
+    `assignee=currentuser() AND statusCategory != Done AND resolution IS EMPTY ORDER BY updated DESC`
   );
 
 class Popup extends React.Component {
@@ -18,10 +18,10 @@ class Popup extends React.Component {
     super(props);
 
     this.state = {
-      jiraSubdomain: props.jiraSubdomain,
+      jiraHost: props.jiraHost,
       mode: 'issues',
       issuesData: {},
-      status: props.jiraSubdomain ? 'launched' : 'noSubdomain',
+      status: props.jiraHost ? 'launched' : 'noSubdomain',
       error: null
     };
     this.fetchIssues = this.fetchIssues.bind(this);
@@ -33,12 +33,12 @@ class Popup extends React.Component {
   }
 
   fetchIssues() {
-    const { jiraSubdomain } = this.state;
+    const { jiraHost } = this.state;
 
-    if (jiraSubdomain) {
+    if (jiraHost) {
       this.setState({ status: 'fetching' });
 
-      fetch(undoneAssignedIssuesURL({ jiraSubdomain }), {
+      fetch(undoneAssignedIssuesURL({ jiraHost }), {
         credentials: 'same-origin'
       })
         .then(response => {
@@ -64,7 +64,7 @@ class Popup extends React.Component {
 
   render() {
     const {
-      jiraSubdomain,
+      jiraHost,
       mode,
       status,
       error,
@@ -102,7 +102,7 @@ class Popup extends React.Component {
               <JiraIssues
                 chrome={chrome}
                 issues={issues}
-                jiraSubdomain={jiraSubdomain}
+                jiraHost={jiraHost}
                 total={total}
               />
             )}
