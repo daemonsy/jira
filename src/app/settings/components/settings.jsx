@@ -16,30 +16,39 @@ const validationMessages = {
     'Did not detect a cookie for this subdomain. Check for typos or you might not be logged in to Jira.',
   bad:
     'The subdomain is invalid. If the organization URL is acme.atlassian.net, only enter acme.',
-  blank: 'Please enter your Jira subdomain'
+  blank: 'Please enter your Jira subdomain',
+  permissionGrantedWithCookie:
+    'Domain permission granted and cookie detected, all good',
+  permissionGrantedNoCookie: `Did not detect a cookie, you might not be logged in or there's a typo?`,
+  permissionDenied: 'No permission to access this host'
 };
 
 const validationIcons = {
   match: check,
   goodNoCookie: exclaimationTriangle,
   bad: times,
-  blank: null
+  blank: null,
+  permissionGrantedWithCookie: check,
+  permissionGrantedNoCookie: exclaimationTriangle,
+  permissionDenied: times
 };
 
 const validationColors = {
   match: '#00d1b2',
-  bad: '#ff3860'
+  permissionGrantedWithCookie: '#00d1b2',
+  bad: '#ff3860',
+  permissionDenied: '#ff3860'
 };
 
-const validateHost = (jiraHost, foundDomains) => {
+const validateHost = (jiraHost, foundDomains, jiraDomainGranted) => {
   let status = 'bad';
 
   if (!jiraHost) {
     status = 'blank';
-  } else if (foundDomains.indexOf(jiraHost) !== -1) {
-    status = 'match';
-  } else if (extractURLHost(jiraHost)) {
-    status = 'goodNoCookie';
+  } else if (foundDomains.indexOf(new URL(jiraHost).hostname) !== -1) {
+    status = 'permissionGrantedWithCookie';
+  } else if (jiraHost && jiraDomainGranted) {
+    status = 'permissionGrantedNoCookie';
   }
 
   return {
@@ -55,7 +64,7 @@ class Settings extends React.Component {
 
     this.state = {
       pristine: true,
-      jiraHost: props.storedJiraHost
+      jiraHost: props.storedJiraHost || ''
     };
 
     this.onChange = this.onChange.bind(this);
@@ -89,7 +98,8 @@ class Settings extends React.Component {
   }
 
   currentMode(props) {
-    const { jiraHost, foundDomains } = props;
+    const { jiraHost } = this.state;
+    const { foundDomains } = props;
     const { pristine } = this.state;
 
     switch (true) {
@@ -108,11 +118,16 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { storedJiraHost, foundDomains } = this.props;
+    const { storedJiraHost, foundDomains, jiraDomainGranted } = this.props;
     const { jiraHost } = this.state;
-    const { icon, message, color } = validateHost(jiraHost, foundDomains);
+    const { icon, message, color } = validateHost(
+      jiraHost,
+      foundDomains,
+      jiraDomainGranted
+    );
     const mode = this.currentMode(this.props, this.state);
     const hostChanged = storedJiraHost !== jiraHost;
+    const hostPresent = !!jiraHost.length;
 
     return (
       <div className="section settings">
@@ -144,21 +159,14 @@ class Settings extends React.Component {
                 </div>
                 <div className="control">
                   <button
-                    disabled={!hostChanged}
+                    disabled={!(hostChanged && hostPresent)}
                     type="button"
                     onClick={this.setJiraHost}
                     className={cx('button', {
-                      'is-primary': hostChanged
+                      'is-primary': hostChanged && hostPresent
                     })}
                   >
-                    {hostChanged ? (
-                      'Set Host'
-                    ) : (
-                      <FontAwesomeIcon
-                        icon={check}
-                        color={validationColors['match']}
-                      />
-                    )}
+                    Set Host
                   </button>
                 </div>
                 {message && <p className="help">{message}</p>}
@@ -175,10 +183,14 @@ class Settings extends React.Component {
                   <code>your-domain.atlassian.net</code> using same origin
                   cookies.
                 </p>
-                <p>
-                  Permission to <code>*.atlassian.net</code> is required for
-                  same origin Jira API requests.
-                </p>
+                {jiraDomainGranted && (
+                  <p>
+                    Permission to <code>{extractURLHost(jiraHost)}</code> is
+                    used to add your session to Jira API requests. You must be
+                    logged in to Jira for these requests to work.
+                  </p>
+                )}
+                <p>This extension does not collect any usage analytics.</p>
               </div>
               <hr />
               <button
@@ -203,7 +215,7 @@ class Settings extends React.Component {
                 className="button is-primary is-medium"
                 onClick={this.onChange}
                 value={foundDomains[0]}
-                style={{ width: '100% ' }}
+                style={{ width: '100%' }}
               >
                 Yes, set it to {foundDomains[0]}
               </button>

@@ -1,1 +1,1 @@
-export const JIRA_DOMAIN = 'gustocorp.com';
+export const JIRA_DOMAIN = 'atlassian.net';

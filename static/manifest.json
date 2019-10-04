@@ -28,7 +28,8 @@
     "scripts": ["background.js"],
     "persistent": true
   },
-  "optional_permissions": ["cookies", "storage", "http://*/", "https://*/"],
+  "permissions": ["storage"],
+  "optional_permissions": ["cookies", "http://*/", "https://*/"],
   "browser_specific_settings": {
     "gecko": {
       "id": "jira@example.com"

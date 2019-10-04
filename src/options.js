@@ -11,14 +11,10 @@ import Settings from './app/settings';
 import getBrowser from './browser/get-browser';
 
 const root = document.getElementById('options');
-const browser = getBrowser();
 
 const setJiraHostAndRequestPermissions = jiraHost => {
-  browser.permissions.request(
-    jiraDomainPermissions({ jiraHost }),
-    jiraDomainGranted => {
-      set({ jiraHost }).then(() => render({ jiraDomainGranted }));
-    }
+  getBrowser().permissions.request(jiraDomainPermissions({ jiraHost }), () =>
+    set({ jiraHost }).then(render)
   );
 };
 
@@ -33,12 +29,17 @@ const renderComponent = ({ jiraHost, foundDomains, jiraDomainGranted }) =>
     root
   );
 
-const render = ({ jiraDomainGranted } = {}) => {
-  Promise.all([get(['jiraHost']), getCookieDomains()]).then(
-    ([{ jiraHost }, foundDomains]) => {
-      renderComponent({ jiraHost, foundDomains, jiraDomainGranted });
-    }
-  );
+const render = () => {
+  get(['jiraHost']).then(({ jiraHost }) => {
+    getCookieDomains(new URL(jiraHost).hostname).then(foundDomains => {
+      getBrowser().permissions.contains(
+        jiraDomainPermissions({ jiraHost }),
+        jiraDomainGranted => {
+          renderComponent({ jiraHost, foundDomains, jiraDomainGranted });
+        }
+      );
+    });
+  });
 };
 
 addOnChangedListener(render);

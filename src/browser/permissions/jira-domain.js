@@ -1,4 +1,4 @@
 export default ({ jiraHost }) => ({
-  permissions: ['cookies', 'storage'],
+  permissions: ['cookies'],
   origins: [`${jiraHost}/*`]
 });
