@@ -10,34 +10,27 @@ import extractURLHost from '../../../utilities/extract-url-host';
 
 const jiraHostPlaceholder = 'Example: https://acme.atlassian.net';
 
-const validationMessages = {
-  match: 'Looks good, detected a cookie at this subdomain',
-  goodNoCookie:
-    'Did not detect a cookie for this subdomain. Check for typos or you might not be logged in to Jira.',
-  bad:
-    'The subdomain is invalid. If the organization URL is acme.atlassian.net, only enter acme.',
-  blank: 'Please enter your Jira subdomain',
-  permissionGrantedWithCookie:
-    'Domain permission granted and cookie detected, all good',
-  permissionGrantedNoCookie: `Did not detect a cookie, you might not be logged in or there's a typo?`,
-  permissionDenied: 'No permission to access this host'
+const COLORS = {
+  good: '#00d1b2',
+  bad: '#ff3860'
 };
 
-const validationIcons = {
-  match: check,
-  goodNoCookie: exclaimationTriangle,
-  bad: times,
-  blank: null,
-  permissionGrantedWithCookie: check,
-  permissionGrantedNoCookie: exclaimationTriangle,
-  permissionDenied: times
-};
-
-const validationColors = {
-  match: '#00d1b2',
-  permissionGrantedWithCookie: '#00d1b2',
-  bad: '#ff3860',
-  permissionDenied: '#ff3860'
+const VALIDATION_LABELS = {
+  blank: { icon: null, message: 'Enter your Jira host' },
+  permissionGrantedWithCookie: {
+    icon: check,
+    message: 'Domain permission granted and cookie detected, all good',
+    color: COLORS.good
+  },
+  permissionGrantedNoCookie: {
+    icon: exclaimationTriangle,
+    message: `Did not detect a cookie, you might not be logged in or there's a typo?`
+  },
+  permissionDenied: {
+    icon: times,
+    message: 'No permission to access this host',
+    color: COLORS.bad
+  }
 };
 
 const validateHost = (jiraHost, foundDomains, jiraDomainGranted) => {
@@ -51,11 +44,7 @@ const validateHost = (jiraHost, foundDomains, jiraDomainGranted) => {
     status = 'permissionGrantedNoCookie';
   }
 
-  return {
-    icon: validationIcons[status],
-    message: validationMessages[status],
-    color: validationColors[status]
-  };
+  return VALIDATION_LABELS[status];
 };
 
 class Settings extends React.Component {
@@ -86,10 +75,10 @@ class Settings extends React.Component {
 
   onChange(event) {
     const {
-      target: { value }
+      target: { value: jiraHost }
     } = event;
 
-    this.setState(() => ({ jiraHost: value }));
+    this.setState(() => ({ jiraHost }));
     this.noLongerPristine();
   }
 
