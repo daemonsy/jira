@@ -21,7 +21,7 @@ export default chrome => {
 
   const messages = {
     defaultPrompt: 'Type in a ticket number or free text to search for issues',
-    noSubdomain:
+    noJiraHost:
       'Jira subdomain needs to be entered. Click here or hit enter to open the Settings page',
     typeMore: 'Nothing yet. Keep typing :)'
   };
@@ -36,8 +36,8 @@ export default chrome => {
       description: escapeEntities(description)
     });
 
-  const displayRelevantSuggestions = (input, suggest, subdomain) => {
-    const apiSearchIssuesURL = buildHelper(subdomain, apiSearchIssuesPath);
+  const displayRelevantSuggestions = (input, suggest, jiraHost) => {
+    const apiSearchIssuesURL = buildHelper(jiraHost, apiSearchIssuesPath);
 
     showDefaultSuggestion(`Search for ${input}...`);
     makeJiraApiCall(apiSearchIssuesURL(input)).then(({ issues = [] }) => {
@@ -49,8 +49,8 @@ export default chrome => {
     });
   };
 
-  const displayProjectSuggestion = (key, suggest, subdomain) => {
-    const apiProjectURL = buildHelper(subdomain, apiProjectPath);
+  const displayProjectSuggestion = (key, suggest, jiraHost) => {
+    const apiProjectURL = buildHelper(jiraHost, apiProjectPath);
     showDefaultSuggestion(`Open project ${key}`);
     makeJiraApiCall(apiProjectURL(key)).then(
       ({ name, key: foundKey, description, errorMessages = [] }) => {
@@ -71,8 +71,8 @@ export default chrome => {
     );
   };
 
-  const displayTicketSuggestion = (key, suggest, subdomain) => {
-    const apiIssueURL = buildHelper(subdomain, apiIssuePath);
+  const displayTicketSuggestion = (key, suggest, jiraHost) => {
+    const apiIssueURL = buildHelper(jiraHost, apiIssuePath);
     showDefaultSuggestion(`Open issue ${key}`);
     makeJiraApiCall(apiIssueURL(key)).then(
       ({ fields, key: foundKey, errorMessages = [] } = {}) => {
@@ -98,7 +98,7 @@ export default chrome => {
       const input = (rawInput || '').trim().toUpperCase();
 
       if (!jiraHost) {
-        showDefaultSuggestion(messages.noSubdomain);
+        showDefaultSuggestion(messages.noJiraHost);
         return;
       }
 

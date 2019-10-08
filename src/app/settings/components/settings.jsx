@@ -6,7 +6,7 @@ import check from '@fortawesome/fontawesome-free-solid/faCheck';
 import times from '@fortawesome/fontawesome-free-solid/faTimes';
 import exclaimationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
 
-import extractURLHost from '../../../utilities/extract-url-host';
+import extractURL from '../../../utilities/extract-url';
 
 const jiraHostPlaceholder = 'Example: https://acme.atlassian.net';
 
@@ -16,7 +16,7 @@ const COLORS = {
 };
 
 const VALIDATION_LABELS = {
-  blank: { icon: null, message: 'Enter your Jira host' },
+  blank: { icon: null, message: null },
   permissionGrantedWithCookie: {
     icon: check,
     message: 'Domain permission granted and cookie detected, all good',
@@ -34,14 +34,16 @@ const VALIDATION_LABELS = {
 };
 
 const validateHost = (jiraHost, foundDomains, jiraDomainGranted) => {
-  let status = 'bad';
+  let status;
 
-  if (!jiraHost) {
-    status = 'blank';
-  } else if (foundDomains.indexOf(new URL(jiraHost).hostname) !== -1) {
+  if (jiraDomainGranted == false) {
+    status = 'permissionDenied';
+  } else if (foundDomains.indexOf(extractURL(jiraHost).hostname) !== -1) {
     status = 'permissionGrantedWithCookie';
   } else if (jiraHost && jiraDomainGranted) {
     status = 'permissionGrantedNoCookie';
+  } else {
+    status = 'blank';
   }
 
   return VALIDATION_LABELS[status];
@@ -61,13 +63,14 @@ class Settings extends React.Component {
     this.noLongerPristine = this.noLongerPristine.bind(this);
   }
 
-  setJiraHost() {
+  setJiraHost(event) {
+    event.preventDefault();
     const { jiraHost } = this.state;
-    const hostname = extractURLHost(jiraHost);
+    const { origin } = extractURL(jiraHost) || {};
 
-    if (hostname) {
+    if (origin) {
       this.setState(
-        () => ({ jiraHost: hostname }),
+        () => ({ jiraHost: origin }),
         () => this.props.setJiraHost(this.state.jiraHost)
       );
     }
@@ -124,7 +127,7 @@ class Settings extends React.Component {
 
         {mode === 'settings' && (
           <React.Fragment>
-            <form className="settings-form">
+            <form className="settings-form" onSubmit={this.setJiraHost}>
               <h4 className="title is-size-4">Jira Host</h4>
               <p className="help">
                 <strong>Paste any Jira URL</strong> into the box or type in your
@@ -148,11 +151,13 @@ class Settings extends React.Component {
                 </div>
                 <div className="control">
                   <button
-                    disabled={!(hostChanged && hostPresent)}
-                    type="button"
-                    onClick={this.setJiraHost}
+                    type="submit"
+                    disabled={
+                      !(hostChanged && hostPresent) && jiraDomainGranted
+                    }
                     className={cx('button', {
-                      'is-primary': hostChanged && hostPresent
+                      'is-primary':
+                        (hostChanged && hostPresent) || !jiraDomainGranted
                     })}
                   >
                     Set Host
@@ -167,22 +172,16 @@ class Settings extends React.Component {
                   to search. You must be logged in to Jira.
                 </p>
                 <p>
-                  <strong>How this works:</strong> After you entered the
-                  subdomain, this extension makes API requests to{' '}
-                  <code>your-domain.atlassian.net</code> using same origin
-                  cookies.
+                  <strong>How this works:</strong> After you entered the host,
+                  the extension uses the permission to add your session to Jira
+                  API requests.
                 </p>
-                {jiraDomainGranted && (
-                  <p>
-                    Permission to <code>{extractURLHost(jiraHost)}</code> is
-                    used to add your session to Jira API requests. You must be
-                    logged in to Jira for these requests to work.
-                  </p>
-                )}
+                <p>You must be logged in to Jira for these requests to work.</p>
                 <p>This extension does not collect any usage analytics.</p>
               </div>
               <hr />
               <button
+                type="button"
                 onClick={window.close}
                 className="button is-medium close-button"
               >

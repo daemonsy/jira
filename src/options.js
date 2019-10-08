@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import { get, set, addOnChangedListener } from './browser/storage';
 import getCookieDomains from './browser/get-cookie-domains';
 import jiraDomainPermissions from './browser/permissions/jira-domain';
+import extractURL from './utilities/extract-url';
 
 import Settings from './app/settings';
 import getBrowser from './browser/get-browser';
@@ -31,7 +32,7 @@ const renderComponent = ({ jiraHost, foundDomains, jiraDomainGranted }) =>
 
 const render = () => {
   get(['jiraHost']).then(({ jiraHost }) => {
-    getCookieDomains(new URL(jiraHost).hostname).then(foundDomains => {
+    getCookieDomains(extractURL(jiraHost).hostname).then(foundDomains => {
       getBrowser().permissions.contains(
         jiraDomainPermissions({ jiraHost }),
         jiraDomainGranted => {
