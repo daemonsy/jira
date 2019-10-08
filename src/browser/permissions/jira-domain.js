@@ -1,4 +1,6 @@
-export default ({ jiraHost }) => ({
-  permissions: ['cookies', 'storage'],
-  origins: [`${jiraHost}/*`]
-});
+export default ({ jiraHost }) => {
+  return {
+    permissions: ['cookies'],
+    origins: [`${jiraHost}/*`]
+  };
+};

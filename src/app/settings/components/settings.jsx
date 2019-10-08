@@ -6,47 +6,47 @@ import check from '@fortawesome/fontawesome-free-solid/faCheck';
 import times from '@fortawesome/fontawesome-free-solid/faTimes';
 import exclaimationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle';
 
-import extractURLHost from '../../../utilities/extract-url-host';
+import extractURL from '../../../utilities/extract-url';
 
 const jiraHostPlaceholder = 'Example: https://acme.atlassian.net';
 
-const validationMessages = {
-  match: 'Looks good, detected a cookie at this subdomain',
-  goodNoCookie:
-    'Did not detect a cookie for this subdomain. Check for typos or you might not be logged in to Jira.',
-  bad:
-    'The subdomain is invalid. If the organization URL is acme.atlassian.net, only enter acme.',
-  blank: 'Please enter your Jira subdomain'
-};
-
-const validationIcons = {
-  match: check,
-  goodNoCookie: exclaimationTriangle,
-  bad: times,
-  blank: null
-};
-
-const validationColors = {
-  match: '#00d1b2',
+const COLORS = {
+  good: '#00d1b2',
   bad: '#ff3860'
 };
 
-const validateHost = (jiraHost, foundDomains) => {
-  let status = 'bad';
+const VALIDATION_LABELS = {
+  blank: { icon: null, message: null },
+  permissionGrantedWithCookie: {
+    icon: check,
+    message: 'Domain permission granted and cookie detected, all good',
+    color: COLORS.good
+  },
+  permissionGrantedNoCookie: {
+    icon: exclaimationTriangle,
+    message: `Did not detect a cookie, you might not be logged in or there's a typo?`
+  },
+  permissionDenied: {
+    icon: times,
+    message: 'No permission to access this host',
+    color: COLORS.bad
+  }
+};
 
-  if (!jiraHost) {
+const validateHost = (jiraHost, foundDomains, jiraDomainGranted) => {
+  let status;
+
+  if (jiraDomainGranted == false) {
+    status = 'permissionDenied';
+  } else if (foundDomains.indexOf(extractURL(jiraHost).hostname) !== -1) {
+    status = 'permissionGrantedWithCookie';
+  } else if (jiraHost && jiraDomainGranted) {
+    status = 'permissionGrantedNoCookie';
+  } else {
     status = 'blank';
-  } else if (foundDomains.indexOf(jiraHost) !== -1) {
-    status = 'match';
-  } else if (extractURLHost(jiraHost)) {
-    status = 'goodNoCookie';
   }
 
-  return {
-    icon: validationIcons[status],
-    message: validationMessages[status],
-    color: validationColors[status]
-  };
+  return VALIDATION_LABELS[status];
 };
 
 class Settings extends React.Component {
@@ -55,7 +55,7 @@ class Settings extends React.Component {
 
     this.state = {
       pristine: true,
-      jiraHost: props.storedJiraHost
+      jiraHost: props.storedJiraHost || ''
     };
 
     this.onChange = this.onChange.bind(this);
@@ -63,13 +63,14 @@ class Settings extends React.Component {
     this.noLongerPristine = this.noLongerPristine.bind(this);
   }
 
-  setJiraHost() {
+  setJiraHost(event) {
+    event.preventDefault();
     const { jiraHost } = this.state;
-    const hostname = extractURLHost(jiraHost);
+    const { origin } = extractURL(jiraHost) || {};
 
-    if (hostname) {
+    if (origin) {
       this.setState(
-        () => ({ jiraHost: hostname }),
+        () => ({ jiraHost: origin }),
         () => this.props.setJiraHost(this.state.jiraHost)
       );
     }
@@ -77,10 +78,10 @@ class Settings extends React.Component {
 
   onChange(event) {
     const {
-      target: { value }
+      target: { value: jiraHost }
     } = event;
 
-    this.setState(() => ({ jiraHost: value }));
+    this.setState(() => ({ jiraHost }));
     this.noLongerPristine();
   }
 
@@ -89,7 +90,8 @@ class Settings extends React.Component {
   }
 
   currentMode(props) {
-    const { jiraHost, foundDomains } = props;
+    const { jiraHost } = this.state;
+    const { foundDomains } = props;
     const { pristine } = this.state;
 
     switch (true) {
@@ -108,11 +110,16 @@ class Settings extends React.Component {
   }
 
   render() {
-    const { storedJiraHost, foundDomains } = this.props;
+    const { storedJiraHost, foundDomains, jiraDomainGranted } = this.props;
     const { jiraHost } = this.state;
-    const { icon, message, color } = validateHost(jiraHost, foundDomains);
+    const { icon, message, color } = validateHost(
+      jiraHost,
+      foundDomains,
+      jiraDomainGranted
+    );
     const mode = this.currentMode(this.props, this.state);
     const hostChanged = storedJiraHost !== jiraHost;
+    const hostPresent = !!jiraHost.length;
 
     return (
       <div className="section settings">
@@ -120,7 +127,7 @@ class Settings extends React.Component {
 
         {mode === 'settings' && (
           <React.Fragment>
-            <form className="settings-form">
+            <form className="settings-form" onSubmit={this.setJiraHost}>
               <h4 className="title is-size-4">Jira Host</h4>
               <p className="help">
                 <strong>Paste any Jira URL</strong> into the box or type in your
@@ -144,21 +151,16 @@ class Settings extends React.Component {
                 </div>
                 <div className="control">
                   <button
-                    disabled={!hostChanged}
-                    type="button"
-                    onClick={this.setJiraHost}
+                    type="submit"
+                    disabled={
+                      !(hostChanged && hostPresent) && jiraDomainGranted
+                    }
                     className={cx('button', {
-                      'is-primary': hostChanged
+                      'is-primary':
+                        (hostChanged && hostPresent) || !jiraDomainGranted
                     })}
                   >
-                    {hostChanged ? (
-                      'Set Host'
-                    ) : (
-                      <FontAwesomeIcon
-                        icon={check}
-                        color={validationColors['match']}
-                      />
-                    )}
+                    Set Host
                   </button>
                 </div>
                 {message && <p className="help">{message}</p>}
@@ -170,18 +172,16 @@ class Settings extends React.Component {
                   to search. You must be logged in to Jira.
                 </p>
                 <p>
-                  <strong>How this works:</strong> After you entered the
-                  subdomain, this extension makes API requests to{' '}
-                  <code>your-domain.atlassian.net</code> using same origin
-                  cookies.
+                  <strong>How this works:</strong> After you entered the host,
+                  the extension uses the permission to add your session to Jira
+                  API requests.
                 </p>
-                <p>
-                  Permission to <code>*.atlassian.net</code> is required for
-                  same origin Jira API requests.
-                </p>
+                <p>You must be logged in to Jira for these requests to work.</p>
+                <p>This extension does not collect any usage analytics.</p>
               </div>
               <hr />
               <button
+                type="button"
                 onClick={window.close}
                 className="button is-medium close-button"
               >
@@ -203,7 +203,7 @@ class Settings extends React.Component {
                 className="button is-primary is-medium"
                 onClick={this.onChange}
                 value={foundDomains[0]}
-                style={{ width: '100% ' }}
+                style={{ width: '100%' }}
               >
                 Yes, set it to {foundDomains[0]}
               </button>

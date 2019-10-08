@@ -1,13 +1,25 @@
+import getBrowser from './get-browser';
+
 export const get = keys =>
   new Promise((resolve, reject) => {
-    chrome.storage.sync.get(keys, resolve);
+    const browser = getBrowser();
+    if (!browser.storage) return resolve({});
+
+    browser.storage.sync.get(keys, resolve);
   });
 
 export const set = object =>
   new Promise((resolve, reject) => {
-    console.log(object);
-    chrome.storage.sync.set(object, resolve);
+    const browser = getBrowser();
+    if (!browser.storage) return resolve();
+
+    browser.storage.sync.set(object, resolve);
   });
 
-export const addOnChangedListener = listener =>
-  chrome.storage.onChanged.addListener(listener);
+export const addOnChangedListener = listener => {
+  const browser = getBrowser();
+  if (!browser.storage) {
+    return null;
+  }
+  browser.storage.onChanged.addListener(listener);
+};
