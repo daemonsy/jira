@@ -33,16 +33,18 @@ const renderComponent = ({ jiraHost, foundDomains, jiraDomainGranted }) =>
 const render = () => {
   get(['jiraHost']).then(({ jiraHost }) => {
     getCookieDomains(extractURL(jiraHost).hostname).then(foundDomains => {
-      getBrowser().permissions.contains(
-        jiraDomainPermissions({ jiraHost }),
-        jiraDomainGranted => {
-          renderComponent({ jiraHost, foundDomains, jiraDomainGranted });
-        }
-      );
+      if (!!jiraHost) {
+        getBrowser().permissions.contains(
+          jiraDomainPermissions({ jiraHost }),
+          jiraDomainGranted => {
+            renderComponent({ jiraHost, foundDomains, jiraDomainGranted });
+          }
+        );
+      } else {
+        renderComponent({ jiraHost, foundDomains, jiraDomainGranted: false });
+      }
     });
   });
 };
-
-addOnChangedListener(render);
 
 render();
